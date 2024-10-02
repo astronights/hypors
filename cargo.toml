@@ -8,5 +8,6 @@ name = "hypors"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-polars = { version = "x", features = ["lazy"]}
+statrs = { version = "0.17.1" }
+polars = { version = ">=0.43.1", features = ["lazy"]}
 pyo3 = { version = "0.22.3", features = ["extension-module"] }
