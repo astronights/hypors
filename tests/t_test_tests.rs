@@ -1,11 +1,12 @@
 #[cfg(test)]
 mod tests {
-    use hypors::t_test::{calculate_ci, calculate_p, TailType};
+    use hypors::common::TailType;
+    use hypors::t_test::{one_sample,two_sample_ind,two_sample_paired};
     use polars::prelude::*;
 
     // Helper function to create a Polars Series
     fn create_series(data: Vec<f64>) -> Series {
-        Series::new("data", data)
+        Series::new("data".into(), data)
     }
 
     #[test]
@@ -18,7 +19,7 @@ mod tests {
         let result = one_sample(&data, pop_mean, TailType::Two, alpha).unwrap();
         
         // Check t-statistic is computed
-        assert!(result.t_stat != 0.0);
+        assert!(result.test_statistic != 0.0);
         
         // Check p-value is reasonable
         assert!(result.p_value < 1.0 && result.p_value > 0.0);
@@ -37,7 +38,7 @@ mod tests {
         let result = two_sample_paired(&data1, &data2, TailType::Two, alpha).unwrap();
         
         // Check the t-statistic and p-value
-        assert!(result.t_stat != 0.0);
+        assert!(result.test_statistic != 0.0);
         assert!(result.p_value > 0.0 && result.p_value < 1.0);
 
         // Check that the null hypothesis is correctly formed
@@ -54,7 +55,7 @@ mod tests {
         let result = two_sample_ind(&data1, &data2, TailType::Two, alpha, false).unwrap();
         
         // Check the t-statistic and p-value
-        assert!(result.t_stat != 0.0);
+        assert!(result.test_statistic != 0.0);
         assert!(result.p_value > 0.0 && result.p_value < 1.0);
 
         // Check that the null hypothesis is correctly formed
@@ -71,7 +72,7 @@ mod tests {
         let result = two_sample_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
         
         // Check the t-statistic and p-value
-        assert!(result.t_stat != 0.0);
+        assert!(result.test_statistic != 0.0);
         assert!(result.p_value > 0.0 && result.p_value < 1.0);
 
         // Check that the null hypothesis is correctly formed

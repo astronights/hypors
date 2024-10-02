@@ -1,13 +1,17 @@
 [package]
 name = "hypors"
+authors = ["Shubhankar Agrawal <shubhankar.a31@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/astronights/hypors"
+keywords = ["statistics", "hypothesis", "testing"]
 
 [lib]
 name = "hypors"
-crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs" 
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
-statrs = { version = "0.17.1" }
-polars = { version = ">=0.43.1", features = ["lazy"]}
-pyo3 = { version = "0.22.3", features = ["extension-module"] }
+serde = "1.0.210"
+statrs = "0.17.1"
+polars = "0.43.1"
