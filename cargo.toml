@@ -1,0 +1,12 @@
+[package]
+name = "hypors"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "hypors"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+polars = { version = "x", features = ["lazy"]}
+pyo3 = { version = "0.22.3", features = ["extension-module"] }
