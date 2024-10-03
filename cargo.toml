@@ -3,6 +3,7 @@ name = "hypors"
 authors = ["Shubhankar Agrawal <shubhankar.a31@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE.txt"
 repository = "https://github.com/astronights/hypors"
 keywords = ["statistics", "hypothesis", "testing"]
 

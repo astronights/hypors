@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod tests_t_test {
     use hypors::common::TailType;
     use hypors::t_test::{one_sample,two_sample_ind,two_sample_paired};
     use polars::prelude::*;

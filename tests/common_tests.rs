@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod tests_common {
     use hypors::common::{calculate_ci, calculate_p, TailType};
     use statrs::distribution::StudentsT;
 
