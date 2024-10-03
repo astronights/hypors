@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests_t_test {
     use hypors::common::TailType;
-    use hypors::t_test::{one_sample,two_sample_ind,two_sample_paired};
+    use hypors::t_test::{one_sample, two_sample_ind, two_sample_paired};
     use polars::prelude::*;
 
     // Helper function to create a Polars Series
@@ -18,14 +18,17 @@ mod tests_t_test {
         // Perform one-sample t-test (two-tailed)
         let result = one_sample(&data, pop_mean, TailType::Two, alpha).unwrap();
         
-        // Check t-statistic is computed
-        assert!(result.test_statistic != 0.0);
-        
-        // Check p-value is reasonable
-        assert!(result.p_value < 1.0 && result.p_value > 0.0);
+        let expected_t_statistic = 0.419;
+        let expected_p_value = 0.696; 
 
-        // Check the reject_null flag (you can fine-tune this based on data)
-        assert_eq!(result.reject_null, false);  // Since data seems close to population mean
+        // Check the t-statistic
+        assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
+        
+        // Check the p-value
+        assert!((result.p_value - expected_p_value).abs() < 0.001);
+
+        // Check the reject_null flag (tweak this based on expected results)
+        assert_eq!(result.reject_null, false); // Based on data analysis
     }
 
     #[test]
@@ -34,12 +37,15 @@ mod tests_t_test {
         let data2 = create_series(vec![1.0, 3.0, 6.0, 7.0, 10.0]);
         let alpha = 0.05;
 
-        // Perform two-sample paired t-test
         let result = two_sample_paired(&data1, &data2, TailType::Two, alpha).unwrap();
         
+        // Calculate expected values based on known statistics
+        let expected_t_statistic = 0.598;
+        let expected_p_value = 0.582;
+
         // Check the t-statistic and p-value
-        assert!(result.test_statistic != 0.0);
-        assert!(result.p_value > 0.0 && result.p_value < 1.0);
+        assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
+        assert!((result.p_value - expected_p_value).abs() < 0.001);
 
         // Check that the null hypothesis is correctly formed
         assert_eq!(result.null_hypothesis, "H0: µ1 = µ2");
@@ -54,9 +60,13 @@ mod tests_t_test {
         // Perform two-sample independent t-test (unpooled)
         let result = two_sample_ind(&data1, &data2, TailType::Two, alpha, false).unwrap();
         
+        // Calculate expected values based on known statistics
+        let expected_t_statistic = 0.099;
+        let expected_p_value = 0.922; 
+
         // Check the t-statistic and p-value
-        assert!(result.test_statistic != 0.0);
-        assert!(result.p_value > 0.0 && result.p_value < 1.0);
+        assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
+        assert!((result.p_value - expected_p_value).abs() < 0.001);
 
         // Check that the null hypothesis is correctly formed
         assert_eq!(result.null_hypothesis, "H0: µ1 = µ2");
@@ -71,9 +81,13 @@ mod tests_t_test {
         // Perform two-sample independent t-test (pooled)
         let result = two_sample_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
         
+        // Calculate expected values based on known statistics
+        let expected_t_statistic = 0.099;
+        let expected_p_value = 0.922;
+
         // Check the t-statistic and p-value
-        assert!(result.test_statistic != 0.0);
-        assert!(result.p_value > 0.0 && result.p_value < 1.0);
+        assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
+        assert!((result.p_value - expected_p_value).abs() < 0.001);
 
         // Check that the null hypothesis is correctly formed
         assert_eq!(result.null_hypothesis, "H0: µ1 = µ2");

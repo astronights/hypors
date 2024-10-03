@@ -47,7 +47,7 @@ pub fn one_sample(
         .mean()
         .ok_or_else(|| PolarsError::ComputeError("Failed to compute sample mean".into()))?;
     let sample_var = series
-        .var(1)
+        .var(0)
         .ok_or_else(|| PolarsError::ComputeError("Failed to compute sample variance".into()))?;
 
     let n = series.len() as f64;
@@ -194,10 +194,10 @@ pub fn two_sample_ind(
         .mean()
         .ok_or_else(|| PolarsError::ComputeError("Failed to compute mean".into()))?;
     let var1 = series1
-        .var(1)
+        .var(0)
         .ok_or_else(|| PolarsError::ComputeError("Failed to compute variance".into()))?;
     let var2 = series2
-        .var(1)
+        .var(0)
         .ok_or_else(|| PolarsError::ComputeError("Failed to compute variance".into()))?;
 
     let n1 = series1.len() as f64;
