@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests_chi_square {
-    use hypors::chi_square::{goodness_of_fit, independence, variance};
+    use hypors::chi_square::{
+        chi2_sample_size_gof, chi2_sample_size_ind, chi2_sample_size_variance, goodness_of_fit,
+        independence, variance,
+    };
     use hypors::common::TailType;
     use polars::prelude::*;
 
@@ -75,5 +78,49 @@ mod tests_chi_square {
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
         assert_eq!(result.reject_null, false);
+    }
+
+    #[test]
+    fn test_chi2_sample_size_gof() {
+        let expected_counts = vec![20, 30, 50];
+        let alpha = 0.05;
+
+        let n = chi2_sample_size_gof(&expected_counts, alpha);
+        let expected_sample_size = 480.0;
+
+        assert!(
+            (n - expected_sample_size).abs() < 1.0,
+            "Sample size is incorrect"
+        );
+    }
+
+    #[test]
+    fn test_chi2_sample_size_ind() {
+        let expected_counts = vec![20, 30, 50];
+        let alpha = 0.05;
+
+        let n = chi2_sample_size_ind(&expected_counts, alpha);
+        let expected_sample_size = 480.0;
+
+        assert!(
+            (n - expected_sample_size).abs() < 1.0,
+            "Sample size is incorrect"
+        );
+    }
+
+    #[test]
+    fn test_chi2_sample_size_variance() {
+        let effect_size = 0.5;
+        let alpha = 0.05;
+        let power = 0.80;
+        let variance = 1.0;
+
+        let n = chi2_sample_size_variance(effect_size, alpha, power, variance);
+        let expected_sample_size = 121.0;
+
+        assert!(
+            (n - expected_sample_size).abs() < 1.0,
+            "Sample size is incorrect"
+        );
     }
 }

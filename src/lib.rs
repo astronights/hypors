@@ -14,6 +14,10 @@
 //! - [`chi_square`] - Implements Chi-square tests for categorical data analysis.
 //! - [`mann_whitney`] - Implements the Mann-Whitney U test for comparing two independent samples.
 //!
+//! ### Sample Size Calculations
+//!
+//! Each of the parametrized tests have the faculty to also calculate minimum sample sizes required based on the Alpha and Power values.
+//!
 //! ## Hypothesis Tests
 //!
 //! ### T-Tests
@@ -38,6 +42,7 @@
 //! - **One-sample t-test**: Tests whether the mean of a single sample differs from a specified population mean.
 //! - **Two-sample paired t-test**: Tests whether the means of two related samples differ.
 //! - **Two-sample independent t-test**: Tests whether the means of two unrelated samples differ, supporting both pooled and unpooled variances (Welch's t-test).
+//! - **Sample Size Calculation**: Use `t_sample_size` to determine the required sample size for specified power and significance levels.
 //!
 //! ---
 //!
@@ -64,6 +69,7 @@
 //! - **One-sample z-test**: Tests whether the mean of a single sample differs from a specified population mean when the population standard deviation is known.
 //! - **Two-sample paired z-test**: Tests whether the means of two related samples differ when the population standard deviation of the differences is known.
 //! - **Two-sample independent z-test**: Tests whether the means of two unrelated samples differ, with options for pooled or unpooled variances, assuming known population standard deviations.
+//! - **Sample Size Calculation**: Use `z_sample_size` to determine the required sample size for specified power and significance levels.
 //!
 //! ---
 //!
@@ -89,6 +95,7 @@
 //! #### Features
 //! - **One-sample proportion test**: Tests whether the proportion of successes in a single sample differs from a specified population proportion.
 //! - **Two-sample proportion test**: Tests whether the proportions of successes in two independent samples differ.
+//! - **Sample Size Calculation**: Use `prop_sample_size` to determine the required sample size for specified power and significance levels.
 //!
 //! ---
 //!
@@ -110,6 +117,7 @@
 //!
 //! #### Features
 //! - **One-way ANOVA**: Tests whether at least one group mean differs from the others across multiple groups.
+//! - **Sample Size Calculation**: Use `f_sample_size` to determine the required sample size for specified power and significance levels.
 //!
 //! ---
 //!
@@ -132,6 +140,7 @@
 //! - **Chi-square variance test**: Tests whether the variance of the distribution differs from the expected variance.
 //! - **Chi-square test for independence**: Tests whether two categorical variables are independent of each other.
 //! - **Chi-square goodness-of-fit test**: Tests whether the observed frequency distribution differs from the expected distribution.
+//! - **Sample Size Calculation**: Use `chi2_sample_size_gof`, `chi2_sample_size_ind`,`chi2_sample_size_variance` to determine the required sample sizes for the different implementations respectively.
 //!
 //! ---
 //!

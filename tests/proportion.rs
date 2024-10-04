@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests_proportion {
     use hypors::common::TailType;
-    use hypors::proportion::{z_test, z_test_ind};
+    use hypors::proportion::{prop_sample_size, z_test, z_test_ind};
     use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // Tolerance for floating-point comparisons
@@ -75,5 +75,18 @@ mod tests_proportion {
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
         assert_eq!(result.reject_null, false);
+    }
+
+    #[test]
+    fn test_prop_sample_size() {
+        let p1 = 0.4;
+        let p2 = 0.6;
+        let alpha = 0.05;
+        let power = 0.80;
+
+        let n = prop_sample_size(p1, p2, alpha, power);
+        let expected_sample_size = 97.0;
+
+        assert!((n - expected_sample_size).abs() < 1.0);
     }
 }

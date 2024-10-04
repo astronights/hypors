@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests_t_test {
     use hypors::common::TailType;
-    use hypors::t::{t_test, t_test_ind, t_test_paired};
+    use hypors::t::{t_sample_size, t_test, t_test_ind, t_test_paired};
     use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // For floating-point comparisons
@@ -105,5 +105,22 @@ mod tests_t_test {
 
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_t_sample_size() {
+        let effect_size = 0.3;
+        let alpha = 0.05;
+        let power = 0.80;
+        let std_dev = 1.0;
+        let tail = TailType::Two;
+
+        let n = t_sample_size(effect_size, alpha, power, std_dev, tail);
+        let expected_sample_size = 88.49;
+
+        assert!(
+            (n - expected_sample_size).abs() < 1.0,
+            "Sample size is incorrect"
+        );
     }
 }

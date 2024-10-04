@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests_z_test {
     use hypors::common::TailType;
-    use hypors::z::{z_test, z_test_ind, z_test_paired};
+    use hypors::z::{z_sample_size, z_test, z_test_ind, z_test_paired};
     use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // For floating-point comparisons
@@ -94,5 +94,23 @@ mod tests_z_test {
 
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
+    }
+
+    #[test]
+    fn test_z_sample_size() {
+        let effect_size = 0.3;
+        let alpha = 0.05;
+        let power = 0.80;
+        let std_dev = 1.0;
+        let tail = TailType::Two;
+
+        let n = z_sample_size(effect_size, alpha, power, std_dev, tail);
+
+        let expected_sample_size = 87.79;
+
+        assert!(
+            (n - expected_sample_size).abs() < 1.0,
+            "Sample size is incorrect"
+        );
     }
 }

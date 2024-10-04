@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests_anova {
-    use hypors::anova::anova;
+    use hypors::anova::{anova, f_sample_size};
     use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // Tolerance for floating-point comparisons
@@ -50,5 +50,18 @@ mod tests_anova {
 
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
+    }
+
+    #[test]
+    fn test_f_sample_size() {
+        let effect_size = 0.25; // Cohen's f
+        let alpha = 0.05; // 5% significance level
+        let power = 0.80; // 80% power
+        let num_groups = 3; // Number of groups
+
+        let n = f_sample_size(effect_size, alpha, power, num_groups);
+        let expected_sample_size = 21717.0;
+
+        assert!((n - expected_sample_size).abs() < 1.0);
     }
 }

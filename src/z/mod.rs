@@ -6,6 +6,11 @@
 //! between sample means or proportions. They are applicable when the population standard
 //! deviation is known and the sample size is large (typically n > 30).
 //!
+//! ## Sample Size Calculation
+//!
+//! To calculate the required sample size for Z-tests, you can use the following function:
+//! - `z_sample_size`: Calculates the necessary sample size for one-sample and two-sample Z-tests based on desired power, significance level, and effect size.
+//!
 //! ## Module Overview
 //!
 //! The `z` module contains functions for performing the following types of Z-tests:
@@ -45,9 +50,20 @@
 //! // Perform the independent two-sample Z-test
 //! let result_ind = z_test_ind(&series1, &series2, pop_std1, pop_std2, tail, alpha).unwrap();
 //! ```
-
+//!
+//! ## Exports
+//!
+//! The following functions are made available for use:
+//!
+//! - `z_test`: Performs a one-sample Z-test.
+//! - `z_test_ind`: Performs an independent two-sample Z-test.
+//! - `z_test_paired`: Performs a paired two-sample Z-test.
+//! - `z_sample_size`: Calculates the required sample size for one-sample and two-sample Z-tests.
+//!
 pub mod one_sample;
+pub mod sample_size;
 pub mod two_sample;
 
 pub use one_sample::z_test;
+pub use sample_size::z_sample_size;
 pub use two_sample::{z_test_ind, z_test_paired};

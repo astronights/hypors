@@ -7,12 +7,20 @@ PyPI Package: Work in Progress
 
 ## Features
 
+### Hypothesis Tests
+
+Hypothesis testing is available for this suite of common distributions.
+
 - **T-Tests**: One-sample, two-sample paired, and two-sample independent t-tests.
 - **Z-Tests**: One-sample, two-sample paired, and two-sample independent z-tests.
 - **Proportion Tests**: One-sample and two-sample proportion tests.
 - **ANOVA**: One-way ANOVA for comparing means across multiple groups.
 - **Chi-Square Tests**: Chi-square test for independence and goodness-of-fit tests.
 - **Mann-Whitney U Test**: Non-parametric test for comparing two independent samples.
+
+### Sample Size Calculation
+
+All parametrized distributions have respective modules to calculate minimum sample size required with customizable parameters for alpha and statistical power.
 
 
 ### **Additional Features**:
