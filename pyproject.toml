@@ -1,0 +1,13 @@
+[build-system]
+requires = ["maturin>=1.7.4", "setuptools>=64.0.2"]
+build-backend = "maturin"
+
+[project]
+name = "hypors"
+version = "0.2.1"
+description = "Hypothesis Testing with Polars"
+authors = [{name = "Shubhankar Agrawal", email = "shubhankar.a31@gmail.com"}]
+license = {file = "license"}
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = ["polars"]
