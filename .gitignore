@@ -13,6 +13,9 @@ Cargo.lock
 ## Cache
 __pycache__
 
+## Virtual Environment
+hypenv/
+
 # Other
 
 notes.txt
