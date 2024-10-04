@@ -6,7 +6,7 @@ edition = "2021"
 license-file = "LICENSE"
 repository = "https://github.com/astronights/hypors"
 description = "Hypothesis Testing with Polars"
-keywords = ["statistics", "hypothesis", "testing", "hypothesis testing", "inference", "inferential statistics", "p-value", "confidence interval", "test statistics", "data science"]
+keywords = ["statistics", "hypothesis", "testing", "data", "p-value"]
 
 [lib]
 name = "hypors"
