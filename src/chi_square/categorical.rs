@@ -2,16 +2,41 @@ use crate::common::{calculate_p, TailType, TestResult};
 use polars::prelude::*;
 use statrs::distribution::ChiSquared;
 
-/// Perform a Chi-Square Test for Independence (using a contingency table).
+/// Perform a Chi-Square Test for Independence using a contingency table.
+///
+/// This test evaluates whether there is a significant association between two categorical variables
+/// based on a contingency table.
 ///
 /// # Arguments
 ///
-/// * `contingency_table` - A 2D Series array representing the contingency table.
-/// * `alpha` - Significance level for the test.
+/// * `contingency_table` - A 2D vector of `f64` representing the observed frequencies in the contingency table.
+/// * `alpha` - The significance level for the test (typically 0.05).
 ///
 /// # Returns
 ///
-/// Returns `Result<TestResult, PolarsError>`.
+/// Returns a `Result<TestResult, PolarsError>`, where `TestResult` contains:
+/// - `test_statistic`: The calculated Chi-Square test statistic.
+/// - `p_value`: The p-value associated with the test statistic.
+/// - `reject_null`: A boolean indicating whether to reject the null hypothesis.
+/// - `null_hypothesis`: The statement of the null hypothesis (H0: Variables are independent).
+/// - `alt_hypothesis`: The statement of the alternative hypothesis (Ha: Variables are not independent).
+///
+/// # Example
+///
+/// ```rust
+/// use crate::chi_square::independence;
+///
+/// // Example contingency table
+/// let contingency_table = vec![
+///     vec![20.0, 30.0],
+///     vec![50.0, 10.0],
+/// ];
+/// let alpha = 0.05;
+///
+/// // Perform Chi-Square Test for Independence
+/// let result = independence(&contingency_table, alpha).unwrap();
+/// println!("Test Statistic: {}, p-value: {}", result.test_statistic, result.p_value);
+/// ```
 pub fn independence(contingency_table: &[Vec<f64>], alpha: f64) -> Result<TestResult, PolarsError> {
     let num_rows = contingency_table.len();
     let num_cols = contingency_table[0].len();
@@ -59,15 +84,38 @@ pub fn independence(contingency_table: &[Vec<f64>], alpha: f64) -> Result<TestRe
 
 /// Perform a Chi-Square Goodness of Fit Test.
 ///
+/// This test determines whether the observed frequencies differ significantly from expected frequencies.
+///
 /// # Arguments
 ///
-/// * `observed` - The observed frequencies as a Series.
-/// * `expected` - The expected frequencies as a Series.
-/// * `alpha` - Significance level for the test.
+/// * `observed` - A `Series` representing the observed frequencies.
+/// * `expected` - A `Series` representing the expected frequencies.
+/// * `alpha` - The significance level for the test (typically 0.05).
 ///
 /// # Returns
 ///
-/// Returns `Result<TestResult, PolarsError>`.
+/// Returns a `Result<TestResult, PolarsError>`, where `TestResult` contains:
+/// - `test_statistic`: The calculated Chi-Square test statistic.
+/// - `p_value`: The p-value associated with the test statistic.
+/// - `reject_null`: A boolean indicating whether to reject the null hypothesis.
+/// - `null_hypothesis`: The statement of the null hypothesis (H0: Observed distribution matches expected distribution).
+/// - `alt_hypothesis`: The statement of the alternative hypothesis (Ha: Observed distribution does not match expected distribution).
+///
+/// # Example
+///
+/// ```rust
+/// use crate::chi_square::goodness_of_fit;
+/// use polars::prelude::*;
+///
+/// // Observed and expected frequencies
+/// let observed = Series::new("Observed", vec![30.0, 10.0, 20.0]);
+/// let expected = Series::new("Expected", vec![25.0, 15.0, 20.0]);
+/// let alpha = 0.05;
+///
+/// // Perform Chi-Square Goodness of Fit Test
+/// let result = goodness_of_fit(&observed, &expected, alpha).unwrap();
+/// println!("Test Statistic: {}, p-value: {}", result.test_statistic, result.p_value);
+/// ```
 pub fn goodness_of_fit(
     observed: &Series,
     expected: &Series,

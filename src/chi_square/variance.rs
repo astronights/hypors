@@ -4,16 +4,40 @@ use statrs::distribution::ChiSquared;
 
 /// Perform a Chi-Square Test for Variance.
 ///
+/// This test evaluates whether the sample variance significantly differs from a specified population variance.
+///
 /// # Arguments
 ///
-/// * `data` - The data Series.
-/// * `pop_variance` - The hypothesized population variance.
-/// * `alpha` - Significance level for the test.
-/// * `tail` - Tail type (left, right, or two-tailed).
+/// * `data` - A `Series` containing the sample data.
+/// * `pop_variance` - The hypothesized population variance against which the sample variance is tested.
+/// * `tail` - The tail type for the test (Left, Right, or Two-tailed).
+/// * `alpha` - The significance level for the test (typically 0.05).
 ///
 /// # Returns
 ///
-/// Returns `Result<TestResult, PolarsError>`, with the confidence interval for the variance.
+/// Returns a `Result<TestResult, PolarsError>`, where `TestResult` contains:
+/// - `test_statistic`: The calculated Chi-Square test statistic for variance.
+/// - `p_value`: The p-value associated with the test statistic.
+/// - `confidence_interval`: The confidence interval for the population variance.
+/// - `null_hypothesis`: The statement of the null hypothesis (H0: σ² = population variance).
+/// - `alt_hypothesis`: The statement of the alternative hypothesis, indicating how the sample variance relates to the population variance.
+/// - `reject_null`: A boolean indicating whether to reject the null hypothesis.
+///
+/// # Example
+///
+/// ```rust
+/// use crate::chi_square::variance;
+/// use polars::prelude::*;
+///
+/// // Sample data
+/// let data = Series::new("data", vec![4.0, 5.0, 6.0, 7.0, 8.0]);
+/// let pop_variance = 2.0; // Hypothesized population variance
+/// let alpha = 0.05; // Significance level
+///
+/// // Perform Chi-Square Test for Variance
+/// let result = variance(&data, pop_variance, TailType::Two, alpha).unwrap();
+/// println!("Test Statistic: {}, p-value: {}", result.test_statistic, result.p_value);
+/// ```
 pub fn variance(
     data: &Series,
     pop_variance: f64,

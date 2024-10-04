@@ -4,28 +4,31 @@ use statrs::distribution::Normal;
 
 /// Performs an independent two-sample proportion test on two unrelated samples.
 ///
+/// This test assesses whether the proportions of successes in two independent samples are significantly different.
+///
 /// # Arguments
 ///
-/// * `series1` - A `Series` containing the first set of sample data (1 for success, 0 for failure).
-/// * `series2` - A `Series` containing the second set of sample data (1 for success, 0 for failure).
-/// * `tail` - The type of tail (left, right, or two) for the test.
-/// * `alpha` - The significance level (e.g., 0.05 for a 95% confidence interval).
-/// * `pooled` - Whether to use pooled proportions for the standard error calculation.
+/// * `series1` - A `Series` containing the first set of sample data, where values are binary (1 for success, 0 for failure).
+/// * `series2` - A `Series` containing the second set of sample data, also binary (1 for success, 0 for failure).
+/// * `tail` - Specifies the type of tail for the test: `TailType::Left`, `TailType::Right`, or `TailType::Two`.
+/// * `alpha` - The significance level for the test (e.g., 0.05 for a 95% confidence level).
+/// * `pooled` - A boolean indicating whether to use pooled proportions for calculating the standard error.
 ///
 /// # Returns
 ///
-/// A `TestResult` struct containing the test statistic, p-value, confidence interval,
-/// null/alternative hypotheses, and a boolean indicating whether the null hypothesis should be rejected.
+/// Returns a `Result<TestResult, PolarsError>`, where:
+/// - `TestResult` contains the test statistic, p-value, confidence interval,
+///   null and alternative hypotheses, and a boolean indicating if the null hypothesis is rejected.
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if there are issues calculating the sample proportions.
+/// Returns a `PolarsError` if any calculations fail, such as when computing the sample proportions.
 ///
 /// # Example
 ///
 /// ```rust
 /// use polars::prelude::*;
-/// use hypors::{two_sample, TailType};
+/// use hypors::{proportion::z_test_ind, TailType};
 ///
 /// let series1 = Series::new("data1", &[1, 0, 1, 1, 0]);
 /// let series2 = Series::new("data2", &[0, 0, 1, 1, 1]);
@@ -33,7 +36,7 @@ use statrs::distribution::Normal;
 /// let alpha = 0.05;
 /// let pooled = true; // Use pooled proportions
 ///
-/// let result = two_sample(&series1, &series2, tail, alpha, pooled).unwrap();
+/// let result = z_test_ind(&series1, &series2, tail, alpha, pooled).unwrap();
 ///
 /// assert!(result.p_value > 0.0 && result.p_value < 1.0);
 /// assert!(result.reject_null == (result.p_value < alpha));

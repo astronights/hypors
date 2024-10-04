@@ -3,6 +3,9 @@ use statrs::distribution::{ChiSquared, ContinuousCDF};
 
 /// Calculates the p-value for a given test statistic.
 ///
+/// This function determines the p-value based on the provided test statistic,
+/// the type of tail (left, right, or two), and the statistical distribution used.
+///
 /// # Arguments
 ///
 /// * `t_stat` - The test statistic (e.g., t-statistic).
@@ -18,13 +21,13 @@ use statrs::distribution::{ChiSquared, ContinuousCDF};
 /// ```rust
 /// use statrs::distribution::{StudentsT, ContinuousCDF};
 /// use hypors::TailType;
-/// use hypors::calculate_p;
+/// use hypors::calculate_p_value;
 ///
 /// let t_stat = 2.0;
 /// let tail = TailType::Two;
 /// let t_dist = StudentsT::new(0.0, 1.0, 10.0).unwrap();  // Student's t-distribution with 10 degrees of freedom
 ///
-/// let p_value = calculate_p(t_stat, tail, &t_dist);
+/// let p_value = calculate_p_value(t_stat, tail, &t_dist);
 /// assert!(p_value > 0.0 && p_value < 1.0);
 /// ```
 pub fn calculate_p_value(t_stat: f64, tail: TailType, dist: &dyn ContinuousCDF<f64, f64>) -> f64 {
@@ -36,6 +39,9 @@ pub fn calculate_p_value(t_stat: f64, tail: TailType, dist: &dyn ContinuousCDF<f
 }
 
 /// Calculates the confidence interval for a sample mean.
+///
+/// This function computes the confidence interval for a sample mean based on
+/// the provided sample mean, standard error, significance level, and statistical distribution.
 ///
 /// # Arguments
 ///
@@ -49,16 +55,17 @@ pub fn calculate_p_value(t_stat: f64, tail: TailType, dist: &dyn ContinuousCDF<f
 /// A tuple `(lower_bound, upper_bound)` representing the confidence interval.
 ///
 /// # Example
+///
 /// ```rust
 /// use statrs::distribution::{StudentsT, ContinuousCDF};
-/// use hypors::calculate_ci;
+/// use hypors::calculate_confidence_interval;
 ///
 /// let sample_mean = 5.0;
 /// let std_error = 1.5;
 /// let alpha = 0.05;
 /// let t_dist = StudentsT::new(0.0, 1.0, 10.0).unwrap();  // Student's t-distribution with 10 degrees of freedom
 ///
-/// let ci = calculate_ci(sample_mean, std_error, alpha, &t_dist);
+/// let ci = calculate_confidence_interval(sample_mean, std_error, alpha, &t_dist);
 /// assert!(ci.0 < sample_mean && ci.1 > sample_mean);  // Lower and upper bounds should surround the mean
 /// ```
 pub fn calculate_confidence_interval(
@@ -72,6 +79,33 @@ pub fn calculate_confidence_interval(
 }
 
 /// Calculates the confidence interval for Chi-squared distribution.
+///
+/// This function computes the confidence interval for the variance of a population
+/// based on the sample variance and the Chi-squared distribution.
+///
+/// # Arguments
+///
+/// * `sample_variance` - The sample variance for the dataset.
+/// * `alpha` - The significance level (e.g., 0.05 for a 95% confidence interval).
+/// * `dist` - The Chi-squared distribution used for the calculation.
+///
+/// # Returns
+///
+/// A tuple `(lower_bound, upper_bound)` representing the confidence interval for variance.
+///
+/// # Example
+///
+/// ```rust
+/// use statrs::distribution::ChiSquared;
+/// use hypors::calculate_chi2_confidence_interval;
+///
+/// let sample_variance = 2.5;
+/// let alpha = 0.05;
+/// let chi_squared_dist = ChiSquared::new(10.0).unwrap();  // Chi-squared distribution with 10 degrees of freedom
+///
+/// let ci = calculate_chi2_confidence_interval(sample_variance, alpha, &chi_squared_dist);
+/// assert!(ci.0 < sample_variance && ci.1 > sample_variance); // Lower and upper bounds should surround the variance
+/// ```
 pub fn calculate_chi2_confidence_interval(
     sample_variance: f64,
     alpha: f64,

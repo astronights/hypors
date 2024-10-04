@@ -17,6 +17,10 @@ use statrs::distribution::Normal;
 ///
 /// A `TestResult` struct containing the test statistic, p-value, confidence interval,
 /// null/alternative hypotheses, and a boolean indicating whether the null hypothesis should be rejected.
+///
+/// # Errors
+///
+/// Returns a `PolarsError` if the mean of differences cannot be computed or other calculations fail.
 pub fn z_test_paired(
     series1: &Series,
     series2: &Series,
@@ -78,6 +82,10 @@ pub fn z_test_paired(
 ///
 /// A `TestResult` struct containing the test statistic, p-value, confidence interval,
 /// null/alternative hypotheses, and a boolean indicating whether the null hypothesis should be rejected.
+///
+/// # Errors
+///
+/// Returns a `PolarsError` if the means cannot be computed or other calculations fail.
 pub fn z_test_ind(
     series1: &Series,
     series2: &Series,

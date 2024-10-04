@@ -3,20 +3,58 @@ use polars::prelude::PolarsError;
 use polars::prelude::*;
 use statrs::distribution::Normal;
 
-/// Performs a one-sample Z-test on the provided data series.
+/// This module implements the one-sample Z-test.
 ///
-/// # Arguments
+/// The one-sample Z-test evaluates whether the mean of a sample differs
+/// from a known population mean, given the population standard deviation.
 ///
-/// * `series` - A `Series` containing the sample data.
-/// * `pop_mean` - The population mean to test against.
-/// * `pop_std` - The population standard deviation.
-/// * `tail` - The type of tail (left, right, or two) for the test.
-/// * `alpha` - The significance level (e.g., 0.05 for a 95% confidence interval).
+/// ## Function
 ///
-/// # Returns
+/// - `z_test`: Conducts a one-sample Z-test on the provided data series.
 ///
-/// A `TestResult` struct containing the test statistic, p-value, confidence interval,
-/// null/alternative hypotheses, and a boolean indicating whether the null hypothesis should be rejected.
+/// ## Arguments
+///
+/// - `series`: A `Series` containing the sample data.
+/// - `pop_mean`: The population mean to compare against.
+/// - `pop_std`: The population standard deviation.
+/// - `tail`: Specifies the type of tail (left, right, or two) for the hypothesis test.
+/// - `alpha`: The significance level for the test (e.g., 0.05 for 95% confidence).
+///
+/// ## Returns
+///
+/// Returns a `TestResult` struct containing:
+/// - `test_statistic`: The calculated Z statistic.
+/// - `p_value`: The p-value associated with the test statistic.
+/// - `confidence_interval`: The confidence interval for the sample mean.
+/// - `null_hypothesis`: A string representing the null hypothesis.
+/// - `alt_hypothesis`: A string representing the alternative hypothesis.
+/// - `reject_null`: A boolean indicating whether to reject the null hypothesis.
+///
+/// ## Errors
+///
+/// Returns a `PolarsError` if there are issues calculating the mean or variance
+/// of the series, or if the statistical calculations fail.
+///
+/// ## Example
+///
+/// ```rust
+/// use polars::prelude::*;
+/// use hypors::{z_test, TailType};
+///
+/// let series = Series::new("data".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
+/// let pop_mean = 2.0;
+/// let pop_std = 1.0; // Known population standard deviation
+/// let tail = TailType::Two; // Two-tailed test
+/// let alpha = 0.05; // 5% significance level
+///
+/// // Perform the one-sample Z-test
+/// let result = z_test(&series, pop_mean, pop_std, tail, alpha).unwrap();
+///
+/// // Check if the p-value is within a valid range
+/// assert!(result.p_value > 0.0 && result.p_value < 1.0);
+/// // Verify if the null hypothesis should be rejected
+/// assert_eq!(result.reject_null, result.p_value < alpha);
+/// ```
 pub fn z_test(
     series: &Series,
     pop_mean: f64,

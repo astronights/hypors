@@ -22,7 +22,7 @@ use statrs::distribution::StudentsT;
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if there are issues calculateulating the mean or variance of the series.
+/// Returns a `PolarsError` if there are issues calculating the mean or variance of the series.
 ///
 /// # Example
 ///
@@ -30,8 +30,8 @@ use statrs::distribution::StudentsT;
 /// use polars::prelude::*;
 /// use hypors::{t_test_paired, TailType};
 ///
-/// let series1 = Series::new("data1".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
-/// let series2 = Series::new("data2".into(), &[1.1, 2.0, 1.7, 2.3, 2.6]);
+/// let series1 = Series::new("data1", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+/// let series2 = Series::new("data2", &[1.1, 2.0, 1.7, 2.3, 2.6]);
 /// let tail = TailType::Two; // Two-tailed test
 /// let alpha = 0.05; // 5% significance level
 ///
@@ -87,7 +87,7 @@ pub fn t_test_paired(
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if there are issues calculateulating the mean or variance of the series.
+/// Returns a `PolarsError` if there are issues calculating the mean or variance of the series.
 ///
 /// # Example
 ///
@@ -95,8 +95,8 @@ pub fn t_test_paired(
 /// use polars::prelude::*;
 /// use hypors::{t_test_ind, TailType};
 ///
-/// let series1 = Series::new("data1".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
-/// let series2 = Series::new("data2".into(), &[1.1, 2.0, 1.7, 2.3, 2.6]);
+/// let series1 = Series::new("data1", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+/// let series2 = Series::new("data2", &[1.1, 2.0, 1.7, 2.3, 2.6]);
 /// let tail = TailType::Two; // Two-tailed test
 /// let alpha = 0.05; // 5% significance level
 /// let pooled = false; // Use Welch's t-test

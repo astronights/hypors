@@ -4,34 +4,37 @@ use statrs::distribution::Normal;
 
 /// Performs a one-sample proportion test on the provided data series.
 ///
+/// This test evaluates whether the sample proportion differs significantly from a specified population proportion.
+///
 /// # Arguments
 ///
-/// * `series` - A `Series` containing the sample data (1 for success, 0 for failure).
-/// * `pop_proportion` - The population proportion to test against (e.g., 0.5).
-/// * `tail` - The type of tail (left, right, or two) for the test.
-/// * `alpha` - The significance level (e.g., 0.05 for a 95% confidence interval).
+/// * `series` - A `Series` containing the sample data, where values should be binary (1 for success, 0 for failure).
+/// * `pop_proportion` - The hypothesized population proportion to test against (e.g., 0.5).
+/// * `tail` - The type of tail for the test: `TailType::Left`, `TailType::Right`, or `TailType::Two`.
+/// * `alpha` - The significance level for the test (e.g., 0.05 for a 95% confidence level).
 ///
 /// # Returns
 ///
-/// A `TestResult` struct containing the test statistic, p-value, confidence interval,
-/// null/alternative hypotheses, and a boolean indicating whether the null hypothesis should be rejected.
+/// Returns a `Result<TestResult, PolarsError>`, where:
+/// - `TestResult` includes the test statistic, p-value, confidence interval,
+///   null and alternative hypotheses, and a boolean indicating if the null hypothesis is rejected.
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if there are issues calculating the sample proportion.
+/// Returns a `PolarsError` if any calculations fail, such as when computing the sample proportion.
 ///
 /// # Example
 ///
 /// ```rust
 /// use polars::prelude::*;
-/// use hypors::{one_sample_proportion, TailType};
+/// use hypors::{proportion::z_test, TailType};
 ///
 /// let series = Series::new("data", &[1, 0, 1, 1, 0]);
 /// let pop_proportion = 0.5;
 /// let tail = TailType::Two;
 /// let alpha = 0.05;
 ///
-/// let result = one_sample(&series, pop_proportion, tail, alpha).unwrap();
+/// let result = z_test(&series, pop_proportion, tail, alpha).unwrap();
 ///
 /// assert!(result.p_value > 0.0 && result.p_value < 1.0);
 /// assert!(result.reject_null == (result.p_value < alpha));
