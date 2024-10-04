@@ -2,6 +2,9 @@
 
 `hypors` is a Rust library designed for performing a variety of hypothesis tests, including t-tests, z-tests, proportion tests, ANOVA, Chi-square tests, and Mann-Whitney tests. This library leverages the `polars` crate for efficient data manipulation and the `statrs` crate for statistical distributions.
 
+Rust Crate: https://crates.io/crates/hypors
+PyPI Package: Work in Progress
+
 ## Features
 
 - **T-Tests**: One-sample, two-sample paired, and two-sample independent t-tests.
