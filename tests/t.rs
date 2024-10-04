@@ -30,7 +30,7 @@ mod tests_t_test {
         assert_eq!(result.reject_null, false);
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
-        
+
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
     }
@@ -54,7 +54,7 @@ mod tests_t_test {
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
-        
+
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
     }
@@ -66,7 +66,7 @@ mod tests_t_test {
         let alpha = 0.05;
 
         let result = t_test_ind(&data1, &data2, TailType::Two, alpha, false).unwrap();
-        
+
         let expected_t_statistic = 0.089;
         let expected_p_value = 0.931;
         let expected_ci_lower = -4.967041;
@@ -78,7 +78,7 @@ mod tests_t_test {
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
-        
+
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
     }
@@ -102,7 +102,7 @@ mod tests_t_test {
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
-        
+
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
     }

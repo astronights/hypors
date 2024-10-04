@@ -71,4 +71,3 @@ pub fn anova(data_groups: &[&Series], alpha: f64) -> Result<TestResult, PolarsEr
         confidence_interval: (f64::NAN, f64::NAN), // ANOVA doesn't produce a typical confidence interval like t-tests
     })
 }
-

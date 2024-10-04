@@ -4,7 +4,6 @@ use polars::prelude::PolarsError;
 use polars::prelude::*;
 use statrs::distribution::StudentsT;
 
-
 /// Performs a paired two-sample t-test on two related samples.
 ///
 /// This function evaluates whether the means of two related groups differ from each other.

@@ -75,6 +75,5 @@ mod tests_chi_square {
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
         assert_eq!(result.reject_null, false);
-
     }
 }

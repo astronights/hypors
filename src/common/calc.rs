@@ -1,5 +1,5 @@
-use statrs::distribution::{ChiSquared, ContinuousCDF};
 use crate::common::TailType;
+use statrs::distribution::{ChiSquared, ContinuousCDF};
 
 /// Calculates the p-value for a given test statistic.
 ///
@@ -72,7 +72,11 @@ pub fn calculate_confidence_interval(
 }
 
 /// Calculates the confidence interval for Chi-squared distribution.
-pub fn calculate_chi2_confidence_interval(sample_variance: f64, alpha: f64, dist: &ChiSquared) -> (f64, f64) {
+pub fn calculate_chi2_confidence_interval(
+    sample_variance: f64,
+    alpha: f64,
+    dist: &ChiSquared,
+) -> (f64, f64) {
     let df = dist.shape(); // Degrees of freedom
     let chi_square_lower = dist.inverse_cdf(alpha / 2.0);
     let chi_square_upper = dist.inverse_cdf(1.0 - alpha / 2.0);

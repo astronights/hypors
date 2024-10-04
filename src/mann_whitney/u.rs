@@ -1,9 +1,14 @@
-use polars::prelude::*;
-use std::f64;
-use statrs::distribution::Normal;
 use crate::common::{calculate_p, TailType, TestResult};
+use polars::prelude::*;
+use statrs::distribution::Normal;
+use std::f64;
 
-pub fn u_test(data1: &Series, data2: &Series, alpha: f64, tail_type: TailType) -> Result<TestResult, PolarsError> {
+pub fn u_test(
+    data1: &Series,
+    data2: &Series,
+    alpha: f64,
+    tail_type: TailType,
+) -> Result<TestResult, PolarsError> {
     let n1 = data1.len() as f64;
     let n2 = data2.len() as f64;
 
@@ -21,11 +26,7 @@ pub fn u_test(data1: &Series, data2: &Series, alpha: f64, tail_type: TailType) -
     }
 
     // Rank the data
-    let mut ranks: Vec<(f64, usize)> = combined
-        .iter()
-        .enumerate()
-        .map(|(i, &v)| (v, i))
-        .collect();
+    let mut ranks: Vec<(f64, usize)> = combined.iter().enumerate().map(|(i, &v)| (v, i)).collect();
     ranks.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
     let mut rank_sum1 = 0.0;

@@ -91,7 +91,8 @@ pub fn goodness_of_fit(
         p_value,
         confidence_interval: (std::f64::NAN, std::f64::NAN),
         null_hypothesis: "H0: Observed distribution matches expected distribution".to_string(),
-        alt_hypothesis: "Ha: Observed distribution does not match expected distribution".to_string(),
+        alt_hypothesis: "Ha: Observed distribution does not match expected distribution"
+            .to_string(),
         reject_null,
     })
 }

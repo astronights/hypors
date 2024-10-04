@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod tests_common {
-    use hypors::common::{calculate_p, calculate_ci, calculate_chi2_ci, 
-        TailType, TestResult};
+    use hypors::common::{calculate_chi2_ci, calculate_ci, calculate_p, TailType, TestResult};
     use statrs::distribution::{ChiSquared, StudentsT};
-    
+
     // Constants to avoid magic numbers
     const EPSILON: f64 = 1e-6; // For floating-point comparisons
 
@@ -32,7 +31,7 @@ mod tests_common {
         let t_dist = StudentsT::new(0.0, 1.0, 10.0).unwrap();
         let t_stat = 2.0;
         let p_value = calculate_p(t_stat, TailType::Two, &t_dist);
-        let expected_p_value = 0.073388; 
+        let expected_p_value = 0.073388;
 
         assert!((p_value - expected_p_value).abs() < EPSILON);
     }
@@ -47,7 +46,7 @@ mod tests_common {
 
         let expected_ci_lower = 2.771861;
         let expected_ci_upper = 7.228138;
-        
+
         assert!((ci.0 - expected_ci_lower).abs() < EPSILON);
         assert!((ci.1 - expected_ci_upper).abs() < EPSILON);
     }
@@ -55,7 +54,7 @@ mod tests_common {
     #[test]
     fn test_calculate_chi2_ci() {
         let df = 9.0;
-        let chi_sq_dist = ChiSquared::new(df).unwrap(); 
+        let chi_sq_dist = ChiSquared::new(df).unwrap();
         let sample_variance = 2.5;
         let alpha = 0.05;
 

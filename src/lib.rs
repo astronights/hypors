@@ -94,10 +94,10 @@
 //!
 //! This project is licensed under the MIT License.
 
-pub mod common;
-pub mod t;
-pub mod z;
 pub mod anova;
 pub mod chi_square;
-pub mod proportion;
+pub mod common;
 pub mod mann_whitney;
+pub mod proportion;
+pub mod t;
+pub mod z;

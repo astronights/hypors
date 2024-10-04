@@ -56,25 +56,24 @@ mod tests_proportion {
     }
 
     #[test]
-fn test_z_test_ind_pooled() {
-    let data1 = create_series(vec![1, 1, 1, 0, 0]); 
-    let data2 = create_series(vec![1, 1, 0, 0, 0]);
-    let alpha = 0.05;
+    fn test_z_test_ind_pooled() {
+        let data1 = create_series(vec![1, 1, 1, 0, 0]);
+        let data2 = create_series(vec![1, 1, 0, 0, 0]);
+        let alpha = 0.05;
 
-    let result = z_test_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
+        let result = z_test_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
 
-    let expected_z_statistic = 0.632;
-    let expected_p_value = 0.527;
-    let expected_null_hypothesis = "H0: p1 = p2";
-    let expected_alt_hypothesis = "Ha: p1 ≠ p2";
+        let expected_z_statistic = 0.632;
+        let expected_p_value = 0.527;
+        let expected_null_hypothesis = "H0: p1 = p2";
+        let expected_alt_hypothesis = "Ha: p1 ≠ p2";
 
-    assert!((result.test_statistic - expected_z_statistic).abs() < 0.001);
-    assert!((result.p_value - expected_p_value).abs() < 0.001);
+        assert!((result.test_statistic - expected_z_statistic).abs() < 0.001);
+        assert!((result.p_value - expected_p_value).abs() < 0.001);
 
-    assert_eq!(result.null_hypothesis, expected_null_hypothesis);
-    assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
+        assert_eq!(result.null_hypothesis, expected_null_hypothesis);
+        assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
-    assert_eq!(result.reject_null, false);
-}
-
+        assert_eq!(result.reject_null, false);
+    }
 }
