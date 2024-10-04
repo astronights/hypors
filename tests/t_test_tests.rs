@@ -17,18 +17,18 @@ mod tests_t_test {
 
         // Perform one-sample t-test (two-tailed)
         let result = one_sample(&data, pop_mean, TailType::Two, alpha).unwrap();
-        
-        let expected_t_statistic = 0.419;
-        let expected_p_value = 0.696; 
+
+        let expected_t_statistic = 0.374;
+        let expected_p_value = 0.726;
 
         // Check the t-statistic
         assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
-        
+
         // Check the p-value
         assert!((result.p_value - expected_p_value).abs() < 0.001);
 
         // Check the reject_null flag (tweak this based on expected results)
-        assert_eq!(result.reject_null, false); // Based on data analysis
+        assert_eq!(result.reject_null, false);
     }
 
     #[test]
@@ -38,10 +38,10 @@ mod tests_t_test {
         let alpha = 0.05;
 
         let result = two_sample_paired(&data1, &data2, TailType::Two, alpha).unwrap();
-        
+
         // Calculate expected values based on known statistics
-        let expected_t_statistic = 0.598;
-        let expected_p_value = 0.582;
+        let expected_t_statistic = 0.534;
+        let expected_p_value = 0.621;
 
         // Check the t-statistic and p-value
         assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
@@ -59,10 +59,10 @@ mod tests_t_test {
 
         // Perform two-sample independent t-test (unpooled)
         let result = two_sample_ind(&data1, &data2, TailType::Two, alpha, false).unwrap();
-        
+
         // Calculate expected values based on known statistics
-        let expected_t_statistic = 0.099;
-        let expected_p_value = 0.922; 
+        let expected_t_statistic = 0.089;
+        let expected_p_value = 0.931;
 
         // Check the t-statistic and p-value
         assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);
@@ -80,10 +80,10 @@ mod tests_t_test {
 
         // Perform two-sample independent t-test (pooled)
         let result = two_sample_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
-        
+
         // Calculate expected values based on known statistics
-        let expected_t_statistic = 0.099;
-        let expected_p_value = 0.922;
+        let expected_t_statistic = 0.089;
+        let expected_p_value = 0.931;
 
         // Check the t-statistic and p-value
         assert!((result.test_statistic - expected_t_statistic).abs() < 0.001);

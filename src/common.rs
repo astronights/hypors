@@ -1,5 +1,5 @@
-use statrs::distribution::ContinuousCDF;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use statrs::distribution::{ChiSquared, ContinuousCDF};
 
 /// Represents the type of tail in hypothesis testing.
 #[derive(Debug, Clone, PartialEq)]
@@ -52,7 +52,6 @@ pub struct TestResult {
     pub reject_null: bool,
 }
 
-
 /// Calculates the p-value for a given test statistic.
 ///
 /// # Arguments
@@ -101,7 +100,6 @@ pub fn calculate_p(t_stat: f64, tail: TailType, dist: &dyn ContinuousCDF<f64, f6
 /// A tuple `(lower_bound, upper_bound)` representing the confidence interval.
 ///
 /// # Example
-///
 /// ```rust
 /// use statrs::distribution::{StudentsT, ContinuousCDF};
 /// use hypors::calculate_ci;
@@ -114,7 +112,24 @@ pub fn calculate_p(t_stat: f64, tail: TailType, dist: &dyn ContinuousCDF<f64, f6
 /// let ci = calculate_ci(sample_mean, std_error, alpha, &t_dist);
 /// assert!(ci.0 < sample_mean && ci.1 > sample_mean);  // Lower and upper bounds should surround the mean
 /// ```
-pub fn calculate_ci(sample_mean: f64, std_error: f64, alpha: f64, dist: &dyn ContinuousCDF<f64, f64>) -> (f64, f64) {
+pub fn calculate_ci(
+    sample_mean: f64,
+    std_error: f64,
+    alpha: f64,
+    dist: &dyn ContinuousCDF<f64, f64>,
+) -> (f64, f64) {
     let margin_of_error = dist.inverse_cdf(1.0 - alpha / 2.0) * std_error;
     (sample_mean - margin_of_error, sample_mean + margin_of_error)
+}
+
+/// Calculates the confidence interval for Chi-squared distribution.
+pub fn calculate_chi2_ci(sample_variance: f64, alpha: f64, dist: &ChiSquared) -> (f64, f64) {
+    let df = dist.shape(); // Degrees of freedom
+    let chi_square_lower = dist.inverse_cdf(alpha / 2.0);
+    let chi_square_upper = dist.inverse_cdf(1.0 - alpha / 2.0);
+
+    // Confidence interval for variance: (n-1) * sample_variance / chi_square_stat
+    let lower_bound = (df * sample_variance) / chi_square_upper;
+    let upper_bound = (df * sample_variance) / chi_square_lower;
+    (lower_bound, upper_bound)
 }
