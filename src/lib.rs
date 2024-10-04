@@ -8,7 +8,7 @@
 //! The library is divided into three main modules:
 //!
 //! - [`common`] - Contains common utilities, types, and helper functions used throughout the library, such as confidence interval calculations, p-value computation, and tail types.
-//! - [`t_test`] - Implements t-tests, including one-sample, two-sample paired, and two-sample independent t-tests, with options for tail-type and pooled or unpooled variances.
+//! - [`t`] - Implements t-tests, including one-sample, two-sample paired, and two-sample independent t-tests, with options for tail-type and pooled or unpooled variances.
 //! - [`z_test`] - Implements z-tests, including one-sample, two-sample paired, and two-sample independent z-tests, with options for tail-type and pooled or unpooled variances.
 //!
 //! ## Example Usage: T-Test
@@ -94,9 +94,10 @@
 //!
 //! This project is licensed under the MIT License.
 
+pub mod common;
+pub mod t;
+pub mod z;
 pub mod anova;
 pub mod chi_square;
-pub mod common;
 pub mod proportion;
-pub mod t_test;
-pub mod z_test;
+pub mod mann_whitney;

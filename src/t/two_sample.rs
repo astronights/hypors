@@ -1,91 +1,13 @@
 use crate::common::{calculate_ci, calculate_p, TailType, TestResult};
+use crate::t::t_test;
 use polars::prelude::PolarsError;
 use polars::prelude::*;
 use statrs::distribution::StudentsT;
 
-/// Performs a one-sample t-test on the provided data series.
-///
-/// # Arguments
-///
-/// * `series` - A `Series` containing the sample data.
-/// * `pop_mean` - The population mean to test against.
-/// * `tail` - The type of tail (left, right, or two) for the test.
-/// * `alpha` - The significance level (e.g., 0.05 for a 95% confidence interval).
-///
-/// # Returns
-///
-/// A `TestResult` struct containing the test statistic, p-value, confidence interval,
-/// null/alternative hypotheses, and a boolean indicating whether the null hypothesis should be rejected.
-///
-/// # Errors
-///
-/// Returns a `PolarsError` if there are issues calculating the mean or variance of the series.
-///
-/// # Example
-///
-/// ```rust
-/// use polars::prelude::*;
-/// use hypors::{one_sample, TailType};
-///
-/// let series = Series::new("data", &[1.2, 2.3, 1.9, 2.5, 2.8]);
-/// let pop_mean = 2.0;
-/// let tail = TailType::Two;
-/// let alpha = 0.05;
-///
-/// let result = one_sample(&series, pop_mean, tail, alpha).unwrap();
-///
-/// assert!(result.p_value > 0.0 && result.p_value < 1.0);
-/// assert!(result.reject_null == (result.p_value < alpha));
-/// ```
-pub fn one_sample(
-    series: &Series,
-    pop_mean: f64,
-    tail: TailType,
-    alpha: f64,
-) -> Result<TestResult, PolarsError> {
-    let sample_mean = series
-        .mean()
-        .ok_or_else(|| PolarsError::ComputeError("Failed to compute sample mean".into()))?;
-    let sample_var = series
-        .var(1)
-        .ok_or_else(|| PolarsError::ComputeError("Failed to compute sample variance".into()))?;
-
-    let n = series.len() as f64;
-    let std_error = (sample_var / n).sqrt();
-
-    let t_stat = (sample_mean - pop_mean) / std_error;
-    let df = n - 1.0;
-
-    let t_dist = StudentsT::new(0.0, 1.0, df).expect("Failed to create StudentsT distribution");
-
-    let p_value = calculate_p(t_stat, tail.clone(), &t_dist);
-    let confidence_interval = calculate_ci(sample_mean, std_error, alpha, &t_dist);
-
-    let reject_null = p_value < alpha;
-
-    let null_hypothesis = match tail {
-        TailType::Left => format!("H0: µ >= {}", pop_mean),
-        TailType::Right => format!("H0: µ <= {}", pop_mean),
-        TailType::Two => format!("H0: µ = {}", pop_mean),
-    };
-
-    let alt_hypothesis = match tail {
-        TailType::Left => format!("Ha: µ < {}", pop_mean),
-        TailType::Right => format!("Ha: µ > {}", pop_mean),
-        TailType::Two => format!("Ha: µ != {}", pop_mean),
-    };
-
-    Ok(TestResult {
-        test_statistic: t_stat,
-        p_value,
-        confidence_interval,
-        null_hypothesis,
-        alt_hypothesis,
-        reject_null,
-    })
-}
 
 /// Performs a paired two-sample t-test on two related samples.
+///
+/// This function evaluates whether the means of two related groups differ from each other.
 ///
 /// # Arguments
 ///
@@ -101,25 +23,28 @@ pub fn one_sample(
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if there are issues calculating the mean or variance of the series.
+/// Returns a `PolarsError` if there are issues calculateulating the mean or variance of the series.
 ///
 /// # Example
 ///
 /// ```rust
 /// use polars::prelude::*;
-/// use hypors::{two_sample_paired, TailType};
+/// use hypors::{t_test_paired, TailType};
 ///
-/// let series1 = Series::new("data1", &[1.2, 2.3, 1.9, 2.5, 2.8]);
-/// let series2 = Series::new("data2", &[1.1, 2.0, 1.7, 2.3, 2.6]);
-/// let tail = TailType::Two;
-/// let alpha = 0.05;
+/// let series1 = Series::new("data1".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
+/// let series2 = Series::new("data2".into(), &[1.1, 2.0, 1.7, 2.3, 2.6]);
+/// let tail = TailType::Two; // Two-tailed test
+/// let alpha = 0.05; // 5% significance level
 ///
-/// let result = two_sample_paired(&series1, &series2, tail, alpha).unwrap();
+/// // Perform the paired two-sample t-test
+/// let result = t_test_paired(&series1, &series2, tail, alpha).unwrap();
 ///
+/// // Check if the p-value is within valid range
 /// assert!(result.p_value > 0.0 && result.p_value < 1.0);
-/// assert!(result.reject_null == (result.p_value < alpha));
+/// // Verify if the null hypothesis should be rejected
+/// assert_eq!(result.reject_null, result.p_value < alpha);
 /// ```
-pub fn two_sample_paired(
+pub fn t_test_paired(
     series1: &Series,
     series2: &Series,
     tail: TailType,
@@ -127,7 +52,7 @@ pub fn two_sample_paired(
 ) -> Result<TestResult, PolarsError> {
     let diff_series = (series1 - series2).expect("Unable to get Series difference");
 
-    let mut result = one_sample(&diff_series, 0.0, tail.clone(), alpha)?;
+    let mut result = t_test(&diff_series, 0.0, tail.clone(), alpha)?;
 
     result.null_hypothesis = match tail {
         TailType::Left => "H0: µ1 >= µ2".to_string(),
@@ -138,13 +63,15 @@ pub fn two_sample_paired(
     result.alt_hypothesis = match tail {
         TailType::Left => "Ha: µ1 < µ2".to_string(),
         TailType::Right => "Ha: µ1 > µ2".to_string(),
-        TailType::Two => "Ha: µ1 != µ2".to_string(),
+        TailType::Two => "Ha: µ1 ≠ µ2".to_string(),
     };
 
     Ok(result)
 }
 
 /// Performs an independent two-sample t-test on two unrelated samples.
+///
+/// This function evaluates whether the means of two independent groups differ from each other.
 ///
 /// # Arguments
 ///
@@ -161,26 +88,29 @@ pub fn two_sample_paired(
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if there are issues calculating the mean or variance of the series.
+/// Returns a `PolarsError` if there are issues calculateulating the mean or variance of the series.
 ///
 /// # Example
 ///
 /// ```rust
 /// use polars::prelude::*;
-/// use hypors::{two_sample_ind, TailType};
+/// use hypors::{t_test_ind, TailType};
 ///
-/// let series1 = Series::new("data1", &[1.2, 2.3, 1.9, 2.5, 2.8]);
-/// let series2 = Series::new("data2", &[1.1, 2.0, 1.7, 2.3, 2.6]);
-/// let tail = TailType::Two;
-/// let alpha = 0.05;
-/// let pooled = false;  // Use Welch's t-test
+/// let series1 = Series::new("data1".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
+/// let series2 = Series::new("data2".into(), &[1.1, 2.0, 1.7, 2.3, 2.6]);
+/// let tail = TailType::Two; // Two-tailed test
+/// let alpha = 0.05; // 5% significance level
+/// let pooled = false; // Use Welch's t-test
 ///
-/// let result = two_sample_ind(&series1, &series2, tail, alpha, pooled).unwrap();
+/// // Perform the independent two-sample t-test
+/// let result = t_test_ind(&series1, &series2, tail, alpha, pooled).unwrap();
 ///
+/// // Check if the p-value is within valid range
 /// assert!(result.p_value > 0.0 && result.p_value < 1.0);
-/// assert!(result.reject_null == (result.p_value < alpha));
+/// // Verify if the null hypothesis should be rejected
+/// assert_eq!(result.reject_null, result.p_value < alpha);
 /// ```
-pub fn two_sample_ind(
+pub fn t_test_ind(
     series1: &Series,
     series2: &Series,
     tail: TailType,
@@ -232,7 +162,7 @@ pub fn two_sample_ind(
     let alt_hypothesis = match tail {
         TailType::Left => "Ha: µ1 < µ2".to_string(),
         TailType::Right => "Ha: µ1 > µ2".to_string(),
-        TailType::Two => "Ha: µ1 != µ2".to_string(),
+        TailType::Two => "Ha: µ1 ≠ µ2".to_string(),
     };
 
     Ok(TestResult {

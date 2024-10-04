@@ -1,6 +1,7 @@
-use crate::common::{calculate_p, TailType, TestResult};
+use crate::common::{calculate_p, mean_null_hypothesis, TailType, TestResult};
 use polars::prelude::*;
 use statrs::distribution::FisherSnedecor;
+use std::f64;
 
 /// Perform one-way ANOVA test.
 ///
@@ -14,7 +15,7 @@ use statrs::distribution::FisherSnedecor;
 ///
 /// The null hypothesis (H0) is that all group means are equal (H0: µ1 = µ2 = µ3 = ...).
 ///
-pub fn one_way(data_groups: &[&Series], alpha: f64) -> Result<TestResult, PolarsError> {
+pub fn anova(data_groups: &[&Series], alpha: f64) -> Result<TestResult, PolarsError> {
     let num_groups = data_groups.len();
     let total_n = data_groups.iter().map(|s| s.len()).sum::<usize>() as f64;
 
@@ -56,10 +57,10 @@ pub fn one_way(data_groups: &[&Series], alpha: f64) -> Result<TestResult, Polars
     let reject_null = p_value < alpha;
 
     // Dynamically create the null hypothesis string (H0)
-    let null_hypothesis = create_null_hypothesis(num_groups);
+    let null_hypothesis = mean_null_hypothesis(num_groups);
 
     // Alternate hypothesis (H1): "At least one group mean is different"
-    let alt_hypothesis = "H1: At least one group mean is different".to_string();
+    let alt_hypothesis = "Ha: At least one group mean is different".to_string();
 
     Ok(TestResult {
         test_statistic: f_statistic,
@@ -67,15 +68,7 @@ pub fn one_way(data_groups: &[&Series], alpha: f64) -> Result<TestResult, Polars
         reject_null,
         null_hypothesis,
         alt_hypothesis,
-        confidence_interval: (std::f64::NAN, std::f64::NAN), // ANOVA doesn't produce a typical confidence interval like t-tests
+        confidence_interval: (f64::NAN, f64::NAN), // ANOVA doesn't produce a typical confidence interval like t-tests
     })
 }
 
-/// Helper function to dynamically create the null hypothesis string
-fn create_null_hypothesis(num_groups: usize) -> String {
-    let mut hypothesis = "H0: µ1".to_string();
-    for i in 2..=num_groups {
-        hypothesis.push_str(&format!(" = µ{}", i));
-    }
-    hypothesis
-}
