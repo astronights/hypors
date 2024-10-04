@@ -1,6 +1,7 @@
 use crate::common::{calculate_p, TailType, TestResult};
 use polars::prelude::*;
 use statrs::distribution::ChiSquared;
+use std::f64;
 
 /// Perform a Chi-Square Test for Independence using a contingency table.
 ///
@@ -75,7 +76,7 @@ pub fn independence(contingency_table: &[Vec<f64>], alpha: f64) -> Result<TestRe
     Ok(TestResult {
         test_statistic,
         p_value,
-        confidence_interval: (std::f64::NAN, std::f64::NAN),
+        confidence_interval: (f64::NAN, f64::NAN),
         null_hypothesis: "H0: Variables are independent".to_string(),
         alt_hypothesis: "Ha: Variables are not independent".to_string(),
         reject_null,
@@ -137,7 +138,7 @@ pub fn goodness_of_fit(
     Ok(TestResult {
         test_statistic,
         p_value,
-        confidence_interval: (std::f64::NAN, std::f64::NAN),
+        confidence_interval: (f64::NAN, f64::NAN),
         null_hypothesis: "H0: Observed distribution matches expected distribution".to_string(),
         alt_hypothesis: "Ha: Observed distribution does not match expected distribution"
             .to_string(),

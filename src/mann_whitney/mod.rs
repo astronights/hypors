@@ -3,7 +3,7 @@
 //! A module for performing the Mann-Whitney U Test.
 //!
 //! The Mann-Whitney U Test, also known as the Wilcoxon rank-sum test,
-//! is a non-parametric test used to determine whether there is a significant 
+//! is a non-parametric test used to determine whether there is a significant
 //! difference between the distributions of two independent groups.
 //!
 //! # Submodules

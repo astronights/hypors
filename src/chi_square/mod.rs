@@ -1,5 +1,5 @@
 //! # Chi Square Tests
-//! 
+//!
 //! The `chi_square` module provides functions for performing Chi-Square tests,
 //! including tests for independence in categorical data and tests for variance.
 //!

@@ -1,5 +1,5 @@
 //! # Z Tests
-//! 
+//!
 //! This module provides implementations for Z-tests.
 //!
 //! Z-tests are statistical tests used to determine if there is a significant difference
@@ -45,7 +45,6 @@
 //! // Perform the independent two-sample Z-test
 //! let result_ind = z_test_ind(&series1, &series2, pop_std1, pop_std2, tail, alpha).unwrap();
 //! ```
-
 
 pub mod one_sample;
 pub mod two_sample;

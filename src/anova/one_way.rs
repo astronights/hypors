@@ -4,17 +4,17 @@ use statrs::distribution::FisherSnedecor;
 use std::f64;
 
 /// Perform a one-way Analysis of Variance (ANOVA) test to compare the means of multiple groups.
-/// 
-/// One-way ANOVA tests whether there are statistically significant differences between the means 
+///
+/// One-way ANOVA tests whether there are statistically significant differences between the means
 /// of two or more independent groups. The null hypothesis (H0) assumes that all group means are equal.
-/// 
+///
 /// ## Arguments
-/// 
+///
 /// * `data_groups` - A slice of `Series` where each `Series` represents the data for a different independent group.
 /// * `alpha` - Significance level for the test (e.g., 0.05).
-/// 
+///
 /// ## Returns
-/// 
+///
 /// This function returns a `Result<TestResult, PolarsError>`, where:
 /// - `TestResult` contains:
 ///     * `test_statistic` - The F-statistic value computed from the data.
@@ -23,34 +23,34 @@ use std::f64;
 ///     * `null_hypothesis` - A string representing the null hypothesis (H0: All group means are equal).
 ///     * `alt_hypothesis` - A string representing the alternative hypothesis (H1: At least one group mean is different).
 ///     * `confidence_interval` - ANOVA does not produce a traditional confidence interval, so this will contain `(NaN, NaN)`.
-/// 
+///
 /// ## Assumptions
 /// - The populations from which the samples are drawn are normally distributed.
 /// - The groups have homogeneity of variances (equal variances).
 /// - The observations are independent.
-/// 
+///
 /// ## Example
-/// 
+///
 /// ```rust
 /// use hypors::anova::anova;
 /// use polars::prelude::*;
-/// 
+///
 /// // Define data for three independent groups
 /// let data1 = Series::new("Group1", vec![2.0, 3.0, 3.0, 5.0, 6.0]);
 /// let data2 = Series::new("Group2", vec![3.0, 4.0, 4.0, 6.0, 8.0]);
 /// let data3 = Series::new("Group3", vec![5.0, 6.0, 7.0, 8.0, 9.0]);
-/// 
+///
 /// // Perform ANOVA
 /// let result = anova(&[&data1, &data2, &data3], 0.05).unwrap();
-/// 
+///
 /// // Check the results
 /// println!("F-statistic: {}", result.test_statistic);
 /// println!("p-value: {}", result.p_value);
 /// println!("Reject Null Hypothesis: {}", result.reject_null);
 /// ```
-/// 
+///
 /// In this example, three groups are tested using one-way ANOVA to determine whether their means are statistically different.
-/// 
+///
 /// ## Notes
 /// - The p-value is computed using the Fisher-Snedecor distribution (F-distribution).
 /// - If the p-value is less than the significance level (alpha), the null hypothesis is rejected, suggesting that not all group means are equal.

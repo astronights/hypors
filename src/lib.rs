@@ -14,13 +14,13 @@
 //! - [`chi_square`] - Implements Chi-square tests for categorical data analysis.
 //! - [`mann_whitney`] - Implements the Mann-Whitney U test for comparing two independent samples.
 //!
-//! ## Example Usage
+//! ## Hypothesis Tests
 //!
-//! ### T-Test
+//! ### T-Tests
 //! Example of performing a one-sample t-test:
 //! ```rust
 //! use polars::prelude::*;
-//! use hypors::{t_test::one_sample, common::TailType};
+//! use hypors::{t::one_sample, common::TailType};
 //!
 //! let data = Series::new("sample", &[1.2, 2.3, 1.9, 2.5, 2.8]);
 //! let population_mean = 2.0;
@@ -34,11 +34,18 @@
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
 //!
-//! ### Z-Test
+//! #### Features
+//! - **One-sample t-test**: Tests whether the mean of a single sample differs from a specified population mean.
+//! - **Two-sample paired t-test**: Tests whether the means of two related samples differ.
+//! - **Two-sample independent t-test**: Tests whether the means of two unrelated samples differ, supporting both pooled and unpooled variances (Welch's t-test).
+//!
+//! ---
+//!
+//! ### Z-Tests
 //! Example of performing a one-sample z-test:
 //! ```rust
 //! use polars::prelude::*;
-//! use hypors::{z_test::one_sample_z, common::TailType};
+//! use hypors::{z::one_sample_z, common::TailType};
 //!
 //! let data = Series::new("sample", &[1.5, 2.3, 2.7, 2.8, 3.1]);
 //! let population_mean = 2.0;
@@ -53,7 +60,14 @@
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
 //!
-//! ### Proportion Test
+//! #### Features
+//! - **One-sample z-test**: Tests whether the mean of a single sample differs from a specified population mean when the population standard deviation is known.
+//! - **Two-sample paired z-test**: Tests whether the means of two related samples differ when the population standard deviation of the differences is known.
+//! - **Two-sample independent z-test**: Tests whether the means of two unrelated samples differ, with options for pooled or unpooled variances, assuming known population standard deviations.
+//!
+//! ---
+//!
+//! ### Proportion Tests
 //! Example of performing a one-sample proportion test:
 //! ```rust
 //! use polars::prelude::*;
@@ -72,11 +86,17 @@
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
 //!
+//! #### Features
+//! - **One-sample proportion test**: Tests whether the proportion of successes in a single sample differs from a specified population proportion.
+//! - **Two-sample proportion test**: Tests whether the proportions of successes in two independent samples differ.
+//!
+//! ---
+//!
 //! ### ANOVA
 //! Example of performing a one-way ANOVA test:
 //! ```rust
 //! use polars::prelude::*;
-//! use hypors::{anova::one_way_anova};
+//! use hypors::anova::one_way_anova;
 //!
 //! let group1 = Series::new("Group 1", &[1.5, 2.5, 1.8]);
 //! let group2 = Series::new("Group 2", &[2.3, 2.9, 3.0]);
@@ -88,11 +108,16 @@
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
 //!
-//! ### Chi-Square Test
+//! #### Features
+//! - **One-way ANOVA**: Tests whether at least one group mean differs from the others across multiple groups.
+//!
+//! ---
+//!
+//! ### Chi-Square Tests
 //! Example of performing a Chi-square test for independence:
 //! ```rust
 //! use polars::prelude::*;
-//! use hypors::{chi_square::chi_square_test};
+//! use hypors::chi_square::chi_square_test;
 //!
 //! let observed = vec![10, 20, 30]; // Observed frequencies
 //! let expected = vec![15, 15, 30]; // Expected frequencies
@@ -103,11 +128,18 @@
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
 //!
+//! #### Features
+//! - **Chi-square variance test**: Tests whether the variance of the distribution differs from the expected variance.
+//! - **Chi-square test for independence**: Tests whether two categorical variables are independent of each other.
+//! - **Chi-square goodness-of-fit test**: Tests whether the observed frequency distribution differs from the expected distribution.
+//!
+//! ---
+//!
 //! ### Mann-Whitney U Test
 //! Example of performing the Mann-Whitney U test:
 //! ```rust
 //! use polars::prelude::*;
-//! use hypors::{mann_whitney::mann_whitney_u};
+//! use hypors::mann_whitney::mann_whitney_u;
 //!
 //! let group1 = Series::new("Group 1", &[1.2, 2.3, 3.1]);
 //! let group2 = Series::new("Group 2", &[2.5, 3.0, 3.8]);
@@ -118,39 +150,12 @@
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
 //!
-//! ## Features
-//!
-//! ### T-Tests
-//!
-//! - **One-sample t-test**: Tests whether the mean of a single sample differs from a specified population mean.
-//! - **Two-sample paired t-test**: Tests whether the means of two related samples differ.
-//! - **Two-sample independent t-test**: Tests whether the means of two unrelated samples differ, supporting both pooled and unpooled variances (Welch's t-test).
-//!
-//! ### Z-Tests
-//!
-//! - **One-sample z-test**: Tests whether the mean of a single sample differs from a specified population mean when the population standard deviation is known.
-//! - **Two-sample paired z-test**: Tests whether the means of two related samples differ when the population standard deviation of the differences is known.
-//! - **Two-sample independent z-test**: Tests whether the means of two unrelated samples differ, with options for pooled or unpooled variances, assuming known population standard deviations.
-//!
-//! ### Proportion Tests
-//!
-//! - **One-sample proportion test**: Tests whether the proportion of successes in a single sample differs from a specified population proportion.
-//! - **Two-sample proportion test**: Tests whether the proportions of successes in two independent samples differ.
-//!
-//! ### ANOVA
-//!
-//! - **One-way ANOVA**: Tests whether at least one group mean differs from the others across multiple groups.
-//!
-//! ### Chi-Square Tests
-//!
-//! - **Chi-square test for independence**: Tests whether two categorical variables are independent of each other.
-//! - **Chi-square goodness-of-fit test**: Tests whether the observed frequency distribution differs from the expected distribution.
-//!
-//! ### Mann-Whitney U Test
-//!
+//! ####  Features
 //! - **Mann-Whitney U test**: A non-parametric test used to determine whether there is a difference between two independent samples. This test is particularly useful when the data does not follow a normal distribution.
 //!
-//! ### Common Features
+//! ---
+//!
+//! ## Common Features
 //!
 //! - **Customizable tail type**: Supports left-tailed, right-tailed, and two-tailed tests for both t-tests and z-tests.
 //! - **Confidence interval calculation**: Returns confidence intervals for all tests.
@@ -161,6 +166,7 @@
 //!
 //! - [`polars`](https://crates.io/crates/polars) for data manipulation and series handling.
 //! - [`statrs`](https://crates.io/crates/statrs) for statistical distributions.
+//! - [`serde`](https://crates.io/crates/serde) for object serialization and deserialization.
 //!
 //! ## Error Handling
 //!
@@ -171,13 +177,10 @@
 //! This project is licensed under the MIT License.
 
 pub mod common;
-use common::{TailType,TestResult};
-
-pub mod t;
-pub mod z;
-pub mod proportion;
 
 pub mod anova;
 pub mod chi_square;
-
 pub mod mann_whitney;
+pub mod proportion;
+pub mod t;
+pub mod z;

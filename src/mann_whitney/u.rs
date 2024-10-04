@@ -5,7 +5,7 @@ use std::f64;
 
 /// Perform the Mann-Whitney U Test for comparing two independent samples.
 ///
-/// This test evaluates whether the distributions of two independent groups are 
+/// This test evaluates whether the distributions of two independent groups are
 /// equal by ranking all observations and comparing the sum of ranks for each group.
 ///
 /// # Arguments
@@ -58,15 +58,11 @@ pub fn u_test(
 
     // Combine the data
     let mut combined = Vec::new();
-    for value in data1.f64()?.into_iter() {
-        if let Some(v) = value {
-            combined.push(v);
-        }
+    for value in data1.f64()?.into_iter().flatten() {
+        combined.push(value);
     }
-    for value in data2.f64()?.into_iter() {
-        if let Some(v) = value {
-            combined.push(v);
-        }
+    for value in data2.f64()?.into_iter().flatten() {
+        combined.push(value);
     }
 
     // Rank the data
