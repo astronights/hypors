@@ -3,6 +3,7 @@
 `hypors` is a Rust library designed for performing a variety of hypothesis tests, including t-tests, z-tests, proportion tests, ANOVA, Chi-square tests, and Mann-Whitney tests. This library leverages the `polars` crate for efficient data manipulation and the `statrs` crate for statistical distributions.
 
 Rust Crate: https://crates.io/crates/hypors
+
 PyPI Package: Work in Progress
 
 ## Features
@@ -36,7 +37,7 @@ To use this library in your Rust project, add the following to your `Cargo.toml`
 
     ```toml
     [dependencies]
-    hypors = "0.2" 
+    hypors = "0.2.1" 
     serde = "1.0.210"
     statrs = "0.17.1"
     polars = "0.43.1"

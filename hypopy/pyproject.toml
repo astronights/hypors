@@ -7,7 +7,11 @@ name = "hypors"
 version = "0.2.1"
 description = "Hypothesis Testing with Polars"
 authors = [{name = "Shubhankar Agrawal", email = "shubhankar.a31@gmail.com"}]
-license = {file = "LICENSE"}
-readme = "README.md"
+license = {file = "../LICENSE"}
 requires-python = ">=3.6"
-dependencies = ["polars"]
+dependencies = ["polars==1.9.0"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
