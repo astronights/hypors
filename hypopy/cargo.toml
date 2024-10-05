@@ -3,7 +3,7 @@ name = "hypors"
 authors = ["Shubhankar Agrawal <shubhankar.a31@gmail.com>"]
 version = "0.2.1"
 edition = "2021"
-license-file = "LICENSE"
+license-file = "../LICENSE"
 repository = "https://github.com/astronights/hypors"
 description = "Hypothesis Testing with Polars"
 keywords = ["statistics", "hypothesis", "testing", "data", "p-value"]
@@ -11,14 +11,13 @@ keywords = ["statistics", "hypothesis", "testing", "data", "p-value"]
 [lib]
 name = "hypors"
 path = "lib.rs" 
-crate-type = ["cdylib", "lib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 serde = "1.0.210"
 statrs = "0.17.1"
 polars = "0.43.1"
-pyo3 = { version = "0.22.3", features = ["extension-module"], optional = true }
+pyo3 = { version = "0.22.3", features = ["extension-module"] }
 
-[features]
-default = []
-python_bindings = ["pyo3"]
+[dev-dependencies]
+maturin = "1.7.4"

@@ -1,5 +1,4 @@
-use crate::register_module;
-use pyo3::{prelude::*, PyResult};
+use pyo3::prelude::*;
 
 pub mod calc;
 pub mod types;
@@ -13,11 +12,10 @@ pub use calc::{
 pub use types::{TailType, TestResult};
 pub use utils::mean_null_hypothesis;
 
-// Register functions and types
-register_module!(common, { 
-    fn calculate_ci, 
-    fn calculate_chi2_ci, 
-    fn calculate_p; 
-    type TailType, 
-    type TestResult 
-});
+pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+
+    m.add_class::<TailType>()?;
+    m.add_class::<TestResult>()?;
+
+    Ok(())
+}
