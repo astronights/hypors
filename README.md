@@ -35,13 +35,13 @@ All parametrized distributions have respective modules to calculate minimum samp
 
 To use this library in your Rust project, add the following to your `Cargo.toml`:
 
-    ```toml
-    [dependencies]
-    hypors = "0.2.1" 
-    serde = "1.0.210"
-    statrs = "0.17.1"
-    polars = "0.43.1"
-    ```
+```toml
+[dependencies]
+hypors = "0.2.2" 
+serde = "1.0.210"
+statrs = "0.17.1"
+polars = "0.43.1"
+```
 
 ## Example Usage
 
@@ -51,31 +51,40 @@ Here are some examples of running tests with Rust.
 
 #### T - Test
 
-    ```rust
-    use polars::prelude::*;
-    use hypors::{t::t_test, common::TailType};
+```rust
+use polars::prelude::*;
+use hypors::{t::t_test, common::TailType};
 
-    let data = Series::new("sample", &[1.2, 2.3, 1.9, 2.5, 2.8]);
-    let population_mean = 2.0;
-    let tail = TailType::Two;
-    let alpha = 0.05;
+let data = Series::new("sample", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+let population_mean = 2.0;
+let tail = TailType::Two;
+let alpha = 0.05;
 
-    let result = t_test(&data, population_mean, tail, alpha).unwrap();
-    println!("Test Statistic: {}", result.test_statistic);
-    ```
+let result = t_test(&data, population_mean, tail, alpha).unwrap();
+println!("Test Statistic: {}", result.test_statistic);
+println!("p-value: {}", result.p_value);
+println!("Confidence Interval: {}", result.confidence_interval);
+println!("Null Hypothesis: {}", result.null_hypothesis);
+println!("Alternate Hypothesis: {}", result.alt_hypothesis);
+println!("Reject Null Hypothesis?: {}", result.reject_null);
+```
 
 #### Chi Square Test
 
-    ```rust
-    use polars::prelude::*;
-    use hypors::{chi_square::independence};
+```rust
+use polars::prelude::*;
+use hypors::{chi_square::independence};
 
-    let observed = vec![10, 20, 30]; // Observed frequencies
-    let expected = vec![15, 15, 30]; // Expected frequencies
+let observed = vec![10, 20, 30]; // Observed frequencies
+let expected = vec![15, 15, 30]; // Expected frequencies
 
-    let result = independece(&observed, &expected).unwrap();
-    println!("Chi-Square Statistic: {}", result.test_statistic);
-    ```
+let result = independece(&observed, &expected).unwrap();
+println!("Chi-Square Statistic: {}", result.test_statistic);
+println!("p-value: {}", result.p_value);
+println!("Null Hypothesis: {}", result.null_hypothesis);
+println!("Alternate Hypothesis: {}", result.alt_hypothesis);
+println!("Reject Null Hypothesis?: {}", result.reject_null);
+```
 
 ### Python
 
