@@ -59,24 +59,44 @@ pub fn u_test(
     // Combine the data
     let mut combined = Vec::new();
     for value in data1.f64()?.into_iter().flatten() {
-        combined.push(value);
+        combined.push((value, 1));
     }
     for value in data2.f64()?.into_iter().flatten() {
-        combined.push(value);
+        combined.push((value, 2));
     }
 
-    // Rank the data
-    let mut ranks: Vec<(f64, usize)> = combined.iter().enumerate().map(|(i, &v)| (v, i)).collect();
-    ranks.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    // Rank the data with tie handling (average rank for ties)
+    combined.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+
+    let mut rank_values = vec![0.0; combined.len()];
+    let mut i = 0;
+
+    // Assign ranks (average ranks for tied values)
+    while i < combined.len() {
+        let start = i;
+        let mut end = i;
+
+        while end + 1 < combined.len() && combined[end + 1].0 == combined[start].0 {
+            end += 1;
+        }
+
+        // Average rank for tied values
+        let rank_avg = ((start + 1) + (end + 1)) as f64 / 2.0;
+        for j in start..=end {
+            rank_values[j] = rank_avg;
+        }
+
+        i = end + 1;
+    }
 
     let mut rank_sum1 = 0.0;
     let mut rank_sum2 = 0.0;
 
-    for (rank, (_value, original_index)) in ranks.iter().enumerate() {
-        if original_index < &(n1 as usize) {
-            rank_sum1 += (rank as f64) + 1.0; // Ranks start at 1
+    for (rank, group) in rank_values.iter().zip(combined.iter()) {
+        if group.1 == 1 {
+            rank_sum1 += rank;
         } else {
-            rank_sum2 += (rank as f64) + 1.0;
+            rank_sum2 += rank;
         }
     }
 
