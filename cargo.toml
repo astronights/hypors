@@ -1,7 +1,7 @@
 [package]
 name = "hypors"
 authors = ["Shubhankar Agrawal <shubhankar.a31@gmail.com>"]
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 license-file = "LICENSE"
 repository = "https://github.com/astronights/hypors"
