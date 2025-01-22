@@ -57,13 +57,9 @@ pub fn u_test(
     let n2 = data2.len() as f64;
 
     // Combine the data
-    let mut combined = Vec::new();
-    for value in data1.f64()?.into_iter().flatten() {
-        combined.push((value, 1));
-    }
-    for value in data2.f64()?.into_iter().flatten() {
-        combined.push((value, 2));
-    }
+    let mut combined = Vec::with_capacity(data1.len() + data2.len());
+    combined.extend(data1.f64()?.into_iter().flatten().map(|v| (v, 1)));
+    combined.extend(data2.f64()?.into_iter().flatten().map(|v| (v, 2)));
 
     // Rank the data with tie handling (average rank for ties)
     combined.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
@@ -82,8 +78,8 @@ pub fn u_test(
 
         // Average rank for tied values
         let rank_avg = ((start + 1) + (end + 1)) as f64 / 2.0;
-        for j in start..=end {
-            rank_values[j] = rank_avg;
+        for v in rank_values.iter_mut().take(end + 1).skip(start) {
+            *v = rank_avg;
         }
 
         i = end + 1;
