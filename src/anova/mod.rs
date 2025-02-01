@@ -22,9 +22,9 @@
 //! use polars::prelude::*;
 //!
 //! // Sample data groups
-//! let group1 = Series::new("Group 1", vec![2.0, 3.0, 3.0, 5.0, 6.0]);
-//! let group2 = Series::new("Group 2", vec![3.0, 4.0, 4.0, 6.0, 8.0]);
-//! let group3 = Series::new("Group 3", vec![5.0, 6.0, 7.0, 8.0, 9.0]);
+//! let group1 = Series::new("Group 1".into(), vec![2.0, 3.0, 3.0, 5.0, 6.0]);
+//! let group2 = Series::new("Group 2".into(), vec![3.0, 4.0, 4.0, 6.0, 8.0]);
+//! let group3 = Series::new("Group 3".into(), vec![5.0, 6.0, 7.0, 8.0, 9.0]);
 //!
 //! // Perform one-way ANOVA
 //! let result = anova(&[&group1, &group2, &group3], 0.05).unwrap();

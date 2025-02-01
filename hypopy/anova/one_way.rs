@@ -32,9 +32,9 @@ use std::f64;
 /// use polars::prelude::*;
 ///
 /// // Define data for three independent groups
-/// let data1 = Series::new("Group1", vec![2.0, 3.0, 3.0, 5.0, 6.0]);
-/// let data2 = Series::new("Group2", vec![3.0, 4.0, 4.0, 6.0, 8.0]);
-/// let data3 = Series::new("Group3", vec![5.0, 6.0, 7.0, 8.0, 9.0]);
+/// let data1 = Series::new("Group1".into(), vec![2.0, 3.0, 3.0, 5.0, 6.0]);
+/// let data2 = Series::new("Group2".into(), vec![3.0, 4.0, 4.0, 6.0, 8.0]);
+/// let data3 = Series::new("Group3".into(), vec![5.0, 6.0, 7.0, 8.0, 9.0]);
 ///
 /// // Perform ANOVA
 /// let result = anova(&[&data1, &data2, &data3], 0.05).unwrap();
@@ -117,12 +117,13 @@ pub fn py_anova(data_groups: Vec<Py<Series>>, alpha: f64) -> PyResult<TestResult
             .map(|s| s.extract::<Series>(py))
             .collect();
 
-            let groups = groups?; // Propagate any extraction errors
+        let groups = groups?; // Propagate any extraction errors
 
-            // Now you have a Vec<Series> which can be used in your ANOVA function.
-            let groups_slice: Vec<&Series> = groups.iter().collect(); // Create a slice of references to Series
+        // Now you have a Vec<Series> which can be used in your ANOVA function.
+        let groups_slice: Vec<&Series> = groups.iter().collect(); // Create a slice of references to Series
 
         // Call the ANOVA function with the slice
-        anova(groups_slice, alpha).map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))
+        anova(groups_slice, alpha)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))
     })
 }

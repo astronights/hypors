@@ -29,7 +29,7 @@ use statrs::distribution::Normal;
 /// use polars::prelude::*;
 /// use hypors::{proportion::z_test, TailType};
 ///
-/// let series = Series::new("data", &[1, 0, 1, 1, 0]);
+/// let series = Series::new("data".into(), &[1, 0, 1, 1, 0]);
 /// let pop_proportion = 0.5;
 /// let tail = TailType::Two;
 /// let alpha = 0.05;

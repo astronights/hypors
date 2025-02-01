@@ -35,8 +35,8 @@ use std::f64;
 /// use crate::mann_whitney::u_test;
 ///
 /// fn main() -> Result<(), PolarsError> {
-///     let data1 = Series::new("group1", vec![1.0, 2.0, 3.0, 4.0]);
-///     let data2 = Series::new("group2", vec![2.5, 3.5, 4.5]);
+///     let data1 = Series::new("group1".into(), vec![1.0, 2.0, 3.0, 4.0]);
+///     let data2 = Series::new("group2".into(), vec![2.5, 3.5, 4.5]);
 ///     let alpha = 0.05;
 ///
 ///     let result = u_test(&data1, &data2, alpha, TailType::Two)?;

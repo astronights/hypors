@@ -109,8 +109,8 @@ pub fn independence(contingency_table: &[Vec<f64>], alpha: f64) -> Result<TestRe
 /// use polars::prelude::*;
 ///
 /// // Observed and expected frequencies
-/// let observed = Series::new("Observed", vec![30.0, 10.0, 20.0]);
-/// let expected = Series::new("Expected", vec![25.0, 15.0, 20.0]);
+/// let observed = Series::new("Observed".into(), vec![30.0, 10.0, 20.0]);
+/// let expected = Series::new("Expected".into(), vec![25.0, 15.0, 20.0]);
 /// let alpha = 0.05;
 ///
 /// // Perform Chi-Square Goodness of Fit Test

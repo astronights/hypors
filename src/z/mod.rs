@@ -32,7 +32,7 @@
 //! use hypors::z::{z_test, z_test_ind, TailType};
 //!
 //! // Example for a one-sample Z-test
-//! let series = Series::new("data", &[10.0, 12.0, 14.0]);
+//! let series = Series::new("data".into(), &[10.0, 12.0, 14.0]);
 //! let pop_mean = 11.0; // Known population mean
 //! let pop_std = 2.0; // Known population standard deviation
 //! let tail = TailType::Two; // Two-tailed test
@@ -42,8 +42,8 @@
 //! let result_one_sample = z_test(&series, pop_mean, pop_std, tail, alpha).unwrap();
 //!
 //! // Example for an independent Z-test
-//! let series1 = Series::new("group1", &[5.0, 6.0, 7.0]);
-//! let series2 = Series::new("group2", &[8.0, 9.0, 10.0]);
+//! let series1 = Series::new("group1".into(), &[5.0, 6.0, 7.0]);
+//! let series2 = Series::new("group2".into(), &[8.0, 9.0, 10.0]);
 //! let pop_std1 = 1.0; // Population standard deviation for group 1
 //! let pop_std2 = 1.0; // Population standard deviation for group 2
 //!

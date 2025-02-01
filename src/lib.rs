@@ -26,7 +26,7 @@
 //! use polars::prelude::*;
 //! use hypors::{t::one_sample, common::TailType};
 //!
-//! let data = Series::new("sample", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+//! let data = Series::new("sample".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
 //! let population_mean = 2.0;
 //! let tail = TailType::Two;
 //! let alpha = 0.05;
@@ -52,7 +52,7 @@
 //! use polars::prelude::*;
 //! use hypors::{z::one_sample_z, common::TailType};
 //!
-//! let data = Series::new("sample", &[1.5, 2.3, 2.7, 2.8, 3.1]);
+//! let data = Series::new("sample".into(), &[1.5, 2.3, 2.7, 2.8, 3.1]);
 //! let population_mean = 2.0;
 //! let population_std_dev = 0.5;
 //! let tail = TailType::Two;
@@ -105,9 +105,9 @@
 //! use polars::prelude::*;
 //! use hypors::anova::one_way_anova;
 //!
-//! let group1 = Series::new("Group 1", &[1.5, 2.5, 1.8]);
-//! let group2 = Series::new("Group 2", &[2.3, 2.9, 3.0]);
-//! let group3 = Series::new("Group 3", &[1.9, 2.2, 2.5]);
+//! let group1 = Series::new("Group 1".into(), &[1.5, 2.5, 1.8]);
+//! let group2 = Series::new("Group 2".into(), &[2.3, 2.9, 3.0]);
+//! let group3 = Series::new("Group 3".into(), &[1.9, 2.2, 2.5]);
 //!
 //! let result = one_way_anova(&[group1, group2, group3]).unwrap();
 //! println!("F Statistic: {}", result.f_statistic);
@@ -150,8 +150,8 @@
 //! use polars::prelude::*;
 //! use hypors::mann_whitney::mann_whitney_u;
 //!
-//! let group1 = Series::new("Group 1", &[1.2, 2.3, 3.1]);
-//! let group2 = Series::new("Group 2", &[2.5, 3.0, 3.8]);
+//! let group1 = Series::new("Group 1".into(), &[1.2, 2.3, 3.1]);
+//! let group2 = Series::new("Group 2".into(), &[2.5, 3.0, 3.8]);
 //!
 //! let result = mann_whitney_u(&group1, &group2).unwrap();
 //! println!("U Statistic: {}", result.u_statistic);

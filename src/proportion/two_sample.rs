@@ -30,8 +30,8 @@ use statrs::distribution::Normal;
 /// use polars::prelude::*;
 /// use hypors::{proportion::z_test_ind, TailType};
 ///
-/// let series1 = Series::new("data1", &[1, 0, 1, 1, 0]);
-/// let series2 = Series::new("data2", &[0, 0, 1, 1, 1]);
+/// let series1 = Series::new("data1".into(), &[1, 0, 1, 1, 0]);
+/// let series2 = Series::new("data2".into(), &[0, 0, 1, 1, 1]);
 /// let tail = TailType::Two;
 /// let alpha = 0.05;
 /// let pooled = true; // Use pooled proportions
