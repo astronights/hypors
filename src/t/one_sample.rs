@@ -29,7 +29,7 @@ use statrs::distribution::StudentsT;
 /// use polars::prelude::*;
 /// use hypors::{t_test, TailType};
 ///
-/// let series = Series::new("data", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+/// let series = Series::new("data".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
 /// let pop_mean = 2.0;
 /// let tail = TailType::Two; // Two-tailed test
 /// let alpha = 0.05; // 5% significance level

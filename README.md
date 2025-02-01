@@ -60,7 +60,7 @@ Here are some examples of running tests with Rust.
 use polars::prelude::*;
 use hypors::{t::t_test, common::TailType};
 
-let data = Series::new("sample", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+let data = Series::new("sample".into(), &[1.2, 2.3, 1.9, 2.5, 2.8]);
 let population_mean = 2.0;
 let tail = TailType::Two;
 let alpha = 0.05;

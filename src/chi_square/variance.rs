@@ -30,7 +30,7 @@ use statrs::distribution::ChiSquared;
 /// use polars::prelude::*;
 ///
 /// // Sample data
-/// let data = Series::new("data", vec![4.0, 5.0, 6.0, 7.0, 8.0]);
+/// let data = Series::new("data".into(), vec![4.0, 5.0, 6.0, 7.0, 8.0]);
 /// let pop_variance = 2.0; // Hypothesized population variance
 /// let alpha = 0.05; // Significance level
 ///
