@@ -16,4 +16,4 @@ crate-type = ["cdylib", "lib"]
 [dependencies]
 serde = ">=1.0.210"
 statrs = ">=0.17.1"
-polars = "0.43.1"
+polars = "0.49.1"
