@@ -37,7 +37,7 @@ To use this library in your Rust project, add the following to your `Cargo.toml`
 
 ```toml
 [dependencies]
-hypors = "0.2.5"
+hypors = "0.2.6"
 ```
 
 **Note** HypoRS relies on the following dependencies, which will be automatically included:
@@ -45,7 +45,7 @@ hypors = "0.2.5"
 ```
 serde (version >=1.0.210)
 statrs (version >=0.17.1)
-polars (version >=0.43.1)
+polars (version >=0.49.1)
 ```
 
 ## Example Usage

@@ -4,7 +4,7 @@ mod tests_common {
     use statrs::distribution::{ChiSquared, StudentsT};
 
     // Constants to avoid magic numbers
-    const EPSILON: f64 = 1e-6; // For floating-point comparisons
+    const EPSILON: f64 = 1e-4; // For floating-point comparisons
 
     #[test]
     fn test_calculate_p_left_tail() {

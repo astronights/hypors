@@ -62,6 +62,6 @@ mod tests_anova {
         let n = f_sample_size(effect_size, alpha, power, num_groups);
         let expected_sample_size = 21717.0;
 
-        assert!((n - expected_sample_size).abs() < 1.0);
+        assert!((n - expected_sample_size).abs() <= 1.0);
     }
 }

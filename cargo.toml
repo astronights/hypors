@@ -1,8 +1,8 @@
 [package]
 name = "hypors"
 authors = ["Shubhankar Agrawal <shubhankar.a31@gmail.com>"]
-version = "0.2.5"
-edition = "2021"
+version = "0.2.6"
+edition = "2024"
 license-file = "LICENSE"
 repository = "https://github.com/astronights/hypors"
 description = "Hypothesis Testing with Polars"
@@ -16,4 +16,4 @@ crate-type = ["cdylib", "lib"]
 [dependencies]
 serde = ">=1.0.210"
 statrs = ">=0.17.1"
-polars = "0.43.1"
+polars = "0.49.1"
