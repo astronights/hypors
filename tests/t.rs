@@ -2,21 +2,16 @@
 mod tests_t_test {
     use hypors::common::TailType;
     use hypors::t::{t_sample_size, t_test, t_test_ind, t_test_paired};
-    use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // For floating-point comparisons
 
-    fn create_series(data: Vec<f64>) -> Series {
-        Series::new("data".into(), data)
-    }
-
     #[test]
     fn test_t_test() {
-        let data = create_series(vec![2.0, 3.0, 5.0, 7.0, 11.0]);
+        let data = vec![2.0, 3.0, 5.0, 7.0, 11.0];
         let pop_mean = 5.0;
         let alpha = 0.05;
 
-        let result = t_test(&data, pop_mean, TailType::Two, alpha).unwrap();
+        let result = t_test(data, pop_mean, TailType::Two, alpha).unwrap();
 
         let expected_t_statistic = 0.374;
         let expected_p_value = 0.726;
@@ -37,11 +32,11 @@ mod tests_t_test {
 
     #[test]
     fn test_t_test_paired() {
-        let data1 = create_series(vec![2.0, 3.0, 5.0, 7.0, 11.0]);
-        let data2 = create_series(vec![1.0, 3.0, 6.0, 7.0, 10.0]);
+        let data1 = vec![2.0, 3.0, 5.0, 7.0, 11.0];
+        let data2 = vec![1.0, 3.0, 6.0, 7.0, 10.0];
         let alpha = 0.05;
 
-        let result = t_test_paired(&data1, &data2, TailType::Two, alpha).unwrap();
+        let result = t_test_paired(data1, data2, TailType::Two, alpha).unwrap();
 
         let expected_t_statistic = 0.534;
         let expected_p_value = 0.621;
@@ -61,11 +56,11 @@ mod tests_t_test {
 
     #[test]
     fn test_t_test_ind_unpooled() {
-        let data1 = create_series(vec![2.0, 3.0, 5.0, 7.0, 11.0]);
-        let data2 = create_series(vec![1.0, 3.0, 6.0, 7.0, 10.0]);
+        let data1 = vec![2.0, 3.0, 5.0, 7.0, 11.0];
+        let data2 = vec![1.0, 3.0, 6.0, 7.0, 10.0];
         let alpha = 0.05;
 
-        let result = t_test_ind(&data1, &data2, TailType::Two, alpha, false).unwrap();
+        let result = t_test_ind(data1, data2, TailType::Two, alpha, false).unwrap();
 
         let expected_t_statistic = 0.089;
         let expected_p_value = 0.931;
@@ -85,11 +80,11 @@ mod tests_t_test {
 
     #[test]
     fn test_t_test_ind_pooled() {
-        let data1 = create_series(vec![2.0, 3.0, 5.0, 7.0, 11.0]);
-        let data2 = create_series(vec![1.0, 3.0, 6.0, 7.0, 10.0]);
+        let data1 = vec![2.0, 3.0, 5.0, 7.0, 11.0];
+        let data2 = vec![1.0, 3.0, 6.0, 7.0, 10.0];
         let alpha = 0.05;
 
-        let result = t_test_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
+        let result = t_test_ind(data1, data2, TailType::Two, alpha, true).unwrap();
 
         let expected_t_statistic = 0.089;
         let expected_p_value = 0.931;

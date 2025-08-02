@@ -2,22 +2,16 @@
 mod tests_mann_whitney {
     use hypors::common::TailType;
     use hypors::mann_whitney::u_test;
-    use polars::prelude::*;
 
     const EPSILON: f64 = 0.0001; // For floating-point comparisons
 
-    // Helper function to create a Polars Series
-    fn create_series(data: Vec<f64>) -> Series {
-        Series::new("data".into(), data)
-    }
-
     #[test]
     fn test_u_test() {
-        let data1 = create_series(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
-        let data2 = create_series(vec![3.0, 4.0, 5.0, 6.0, 7.0]);
+        let data1 = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let data2 = vec![3.0, 4.0, 5.0, 6.0, 7.0];
         let alpha = 0.05;
 
-        let result = u_test(&data1, &data2, alpha, TailType::Two).unwrap();
+        let result = u_test(data1, data2, alpha, TailType::Two).unwrap();
 
         let expected_u_statistic = 4.5;
         let expected_p_value = 0.0946;
@@ -35,10 +29,10 @@ mod tests_mann_whitney {
 
     #[test]
     fn test_u_test_equal() {
-        let data = create_series(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let alpha = 0.05;
 
-        let result = u_test(&data, &data, alpha, TailType::Two).unwrap();
+        let result = u_test(data.clone(), data, alpha, TailType::Two).unwrap();
 
         let expected_u_statistic = 12.5;
         let expected_p_value = 1.0;

@@ -2,22 +2,16 @@
 mod tests_proportion {
     use hypors::common::TailType;
     use hypors::proportion::{prop_sample_size, z_test, z_test_ind};
-    use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // Tolerance for floating-point comparisons
 
-    // Helper function to create a Polars Series
-    fn create_series(data: Vec<u32>) -> Series {
-        Series::new("data".into(), data)
-    }
-
     #[test]
     fn test_z_test() {
-        let data = create_series(vec![1, 1, 1, 0, 0]);
+        let data = vec![1, 1, 1, 0, 0];
         let null_prop = 0.5;
         let alpha = 0.05;
 
-        let result = z_test(&data, null_prop, TailType::Two, alpha).unwrap();
+        let result = z_test(data, null_prop, TailType::Two, alpha).unwrap();
 
         let expected_z_statistic = 0.447;
         let expected_p_value = 0.655;
@@ -35,11 +29,11 @@ mod tests_proportion {
 
     #[test]
     fn test_z_test_ind_unpooled() {
-        let data1 = create_series(vec![1, 1, 1, 0, 0]);
-        let data2 = create_series(vec![1, 1, 0, 0, 0]);
+        let data1 = vec![1, 1, 1, 0, 0];
+        let data2 = vec![1, 1, 0, 0, 0];
         let alpha = 0.05;
 
-        let result = z_test_ind(&data1, &data2, TailType::Two, alpha, false).unwrap();
+        let result = z_test_ind(data1, data2, TailType::Two, alpha, false).unwrap();
 
         let expected_z_statistic = 0.645;
         let expected_p_value = 0.518;
@@ -57,11 +51,11 @@ mod tests_proportion {
 
     #[test]
     fn test_z_test_ind_pooled() {
-        let data1 = create_series(vec![1, 1, 1, 0, 0]);
-        let data2 = create_series(vec![1, 1, 0, 0, 0]);
+        let data1 = vec![1, 1, 1, 0, 0];
+        let data2 = vec![1, 1, 0, 0, 0];
         let alpha = 0.05;
 
-        let result = z_test_ind(&data1, &data2, TailType::Two, alpha, true).unwrap();
+        let result = z_test_ind(data1, data2, TailType::Two, alpha, true).unwrap();
 
         let expected_z_statistic = 0.632;
         let expected_p_value = 0.527;

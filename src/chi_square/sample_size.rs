@@ -16,12 +16,12 @@ use statrs::distribution::{ChiSquared, ContinuousCDF};
 ///
 /// # Example
 /// ```rust
-/// use hypors::{chi2_sample_size_gof};
+/// use hypors::chi_square::chi2_sample_size_gof;
 ///
 /// let expected_counts = vec![20, 30, 50];
 /// let alpha = 0.05; // 5% significance level
 ///
-/// let sample_size = chi2_sample_size_gof(&expected_counts, alpha, power);
+/// let sample_size = chi2_sample_size_gof(&expected_counts, alpha);
 /// println!("Required sample size: {}", sample_size);
 /// ```
 pub fn chi2_sample_size_gof(expected_counts: &[usize], alpha: f64) -> f64 {
@@ -62,12 +62,12 @@ pub fn chi2_sample_size_gof(expected_counts: &[usize], alpha: f64) -> f64 {
 ///
 /// # Example
 /// ```rust
-/// use hypors::{chi2_sample_size_ind};
+/// use hypors::chi_square::chi2_sample_size_ind;
 ///
 /// let expected_counts = vec![20, 30, 50];
 /// let alpha = 0.05; // 5% significance level
 ///
-/// let sample_size = chi2_sample_size_ind(&expected_counts, alpha, power);
+/// let sample_size = chi2_sample_size_ind(&expected_counts, alpha);
 /// println!("Required sample size: {}", sample_size);
 /// ```
 pub fn chi2_sample_size_ind(expected_counts: &[usize], alpha: f64) -> f64 {
@@ -110,7 +110,7 @@ pub fn chi2_sample_size_ind(expected_counts: &[usize], alpha: f64) -> f64 {
 ///
 /// # Example
 /// ```rust
-/// use hypors::{chi2_sample_size_variance};
+/// use hypors::chi_square::chi2_sample_size_variance;
 ///
 /// let effect_size = 0.5; // Minimum detectable effect size
 /// let alpha = 0.05; // 5% significance level

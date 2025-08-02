@@ -23,15 +23,14 @@
 //! ### T-Tests
 //! Example of performing a one-sample t-test:
 //! ```rust
-//! use polars::prelude::*;
-//! use hypors::{t::one_sample, common::TailType};
+//! use hypors::{t::t_test, common::TailType};
 //!
-//! let data = Series::new("sample", &[1.2, 2.3, 1.9, 2.5, 2.8]);
+//! let data = [1.2, 2.3, 1.9, 2.5, 2.8];
 //! let population_mean = 2.0;
 //! let tail = TailType::Two;
 //! let alpha = 0.05;
 //!
-//! let result = one_sample(&data, population_mean, tail, alpha).unwrap();
+//! let result = t_test(data, population_mean, tail, alpha).unwrap();
 //! println!("Test Statistic: {}", result.test_statistic);
 //! println!("P-value: {}", result.p_value);
 //! println!("Confidence Interval: {:?}", result.confidence_interval);
@@ -49,16 +48,15 @@
 //! ### Z-Tests
 //! Example of performing a one-sample z-test:
 //! ```rust
-//! use polars::prelude::*;
-//! use hypors::{z::one_sample_z, common::TailType};
+//! use hypors::{z::z_test, common::TailType};
 //!
-//! let data = Series::new("sample", &[1.5, 2.3, 2.7, 2.8, 3.1]);
+//! let data = vec![1.5, 2.3, 2.7, 2.8, 3.1];
 //! let population_mean = 2.0;
 //! let population_std_dev = 0.5;
 //! let tail = TailType::Two;
 //! let alpha = 0.05;
 //!
-//! let result = one_sample_z(&data, population_mean, population_std_dev, tail, alpha).unwrap();
+//! let result = z_test(data, population_mean, population_std_dev, tail, alpha).unwrap();
 //! println!("Z Statistic: {}", result.test_statistic);
 //! println!("P-value: {}", result.p_value);
 //! println!("Confidence Interval: {:?}", result.confidence_interval);
@@ -76,16 +74,14 @@
 //! ### Proportion Tests
 //! Example of performing a one-sample proportion test:
 //! ```rust
-//! use polars::prelude::*;
-//! use hypors::{proportion::one_sample_proportion, common::TailType};
+//! use hypors::{proportion::z_test, common::TailType};
 //!
-//! let successes = 30; // Number of successes
-//! let sample_size = 100; // Total sample size
+//! let successes = vec![1, 1, 0, 1, 0]; // Number of successes
 //! let population_proportion = 0.25; // Population proportion
 //! let tail = TailType::Right;
 //! let alpha = 0.05;
 //!
-//! let result = one_sample_proportion(successes, sample_size, population_proportion, tail, alpha).unwrap();
+//! let result = z_test(successes, population_proportion, tail, alpha).unwrap();
 //! println!("Test Statistic: {}", result.test_statistic);
 //! println!("P-value: {}", result.p_value);
 //! println!("Confidence Interval: {:?}", result.confidence_interval);
@@ -102,15 +98,15 @@
 //! ### ANOVA
 //! Example of performing a one-way ANOVA test:
 //! ```rust
-//! use polars::prelude::*;
-//! use hypors::anova::one_way_anova;
+//! use hypors::anova::anova;
 //!
-//! let group1 = Series::new("Group 1", &[1.5, 2.5, 1.8]);
-//! let group2 = Series::new("Group 2", &[2.3, 2.9, 3.0]);
-//! let group3 = Series::new("Group 3", &[1.9, 2.2, 2.5]);
+//! let group1 = vec![1.5, 2.5, 1.8];
+//! let group2 = vec![2.3, 2.9, 3.0];
+//! let group3 = vec![1.9, 2.2, 2.5];
+//! let alpha = 0.05;
 //!
-//! let result = one_way_anova(&[group1, group2, group3]).unwrap();
-//! println!("F Statistic: {}", result.f_statistic);
+//! let result = anova(&[group1, group2, group3], alpha).unwrap();
+//! println!("F Statistic: {}", result.test_statistic);
 //! println!("P-value: {}", result.p_value);
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
@@ -122,16 +118,16 @@
 //! ---
 //!
 //! ### Chi-Square Tests
-//! Example of performing a Chi-square test for independence:
+//! Example of performing a Chi-square test for Goodness of Fit:
 //! ```rust
-//! use polars::prelude::*;
-//! use hypors::chi_square::chi_square_test;
+//! use hypors::chi_square::goodness_of_fit;
 //!
 //! let observed = vec![10, 20, 30]; // Observed frequencies
 //! let expected = vec![15, 15, 30]; // Expected frequencies
+//! let alpha = 0.05;
 //!
-//! let result = chi_square_test(&observed, &expected).unwrap();
-//! println!("Chi-Square Statistic: {}", result.chi_square_statistic);
+//! let result = goodness_of_fit(observed, expected, alpha).unwrap();
+//! println!("Chi-Square Statistic: {}", result.test_statistic);
 //! println!("P-value: {}", result.p_value);
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
@@ -147,14 +143,15 @@
 //! ### Mann-Whitney U Test
 //! Example of performing the Mann-Whitney U test:
 //! ```rust
-//! use polars::prelude::*;
-//! use hypors::mann_whitney::mann_whitney_u;
+//! use hypors::mann_whitney::u_test;
+//! use hypors::common::TailType;
 //!
-//! let group1 = Series::new("Group 1", &[1.2, 2.3, 3.1]);
-//! let group2 = Series::new("Group 2", &[2.5, 3.0, 3.8]);
+//! let group1 = vec![1.2, 2.3, 3.1];
+//! let group2 = vec![2.5, 3.0, 3.8];
+//! let alpha = 0.05;
 //!
-//! let result = mann_whitney_u(&group1, &group2).unwrap();
-//! println!("U Statistic: {}", result.u_statistic);
+//! let result = u_test(group1, group2, alpha, TailType::Two).unwrap();
+//! println!("U Statistic: {}", result.test_statistic);
 //! println!("P-value: {}", result.p_value);
 //! println!("Reject Null Hypothesis: {}", result.reject_null);
 //! ```
@@ -169,11 +166,18 @@
 //! - **Customizable tail type**: Supports left-tailed, right-tailed, and two-tailed tests for both t-tests and z-tests.
 //! - **Confidence interval calculation**: Returns confidence intervals for all tests.
 //!
+//! ## Usage with Polars
+//!
+//! The library is designed to work with Vectors, arrays, and iterators of numeric data types.
+//! It can also be integrated with the `polars` crate for more complex data manipulation tasks.
+//! However, due to frequent minor version updates in `polars`, data should be converted to a
+//! compatible format (e.g., `Vec<f64>`) before and after usage.
+//!
+//!
 //! ## Crate Dependencies
 //!
 //! This library relies on the following crates:
 //!
-//! - [`polars`](https://crates.io/crates/polars) for data manipulation and series handling.
 //! - [`statrs`](https://crates.io/crates/statrs) for statistical distributions.
 //! - [`serde`](https://crates.io/crates/serde) for object serialization and deserialization.
 //!

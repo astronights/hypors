@@ -20,8 +20,8 @@ use statrs::distribution::{ChiSquared, ContinuousCDF};
 ///
 /// ```rust
 /// use statrs::distribution::{StudentsT, ContinuousCDF};
-/// use hypors::TailType;
-/// use hypors::calculate_p_value;
+/// use hypors::common::types::TailType;
+/// use hypors::common::calc::calculate_p_value;
 ///
 /// let t_stat = 2.0;
 /// let tail = TailType::Two;
@@ -58,7 +58,7 @@ pub fn calculate_p_value(t_stat: f64, tail: TailType, dist: &dyn ContinuousCDF<f
 ///
 /// ```rust
 /// use statrs::distribution::{StudentsT, ContinuousCDF};
-/// use hypors::calculate_confidence_interval;
+/// use hypors::common::calc::calculate_confidence_interval;
 ///
 /// let sample_mean = 5.0;
 /// let std_error = 1.5;
@@ -97,7 +97,7 @@ pub fn calculate_confidence_interval(
 ///
 /// ```rust
 /// use statrs::distribution::ChiSquared;
-/// use hypors::calculate_chi2_confidence_interval;
+/// use hypors::common::calc::calculate_chi2_confidence_interval;
 ///
 /// let sample_variance = 2.5;
 /// let alpha = 0.05;

@@ -1,22 +1,16 @@
 #[cfg(test)]
 mod tests_anova {
     use hypors::anova::{anova, f_sample_size};
-    use polars::prelude::*;
 
     const EPSILON: f64 = 0.001; // Tolerance for floating-point comparisons
 
-    // Helper function to create a Polars Series
-    fn create_series(data: Vec<f64>) -> Series {
-        Series::new("data".into(), data)
-    }
-
     #[test]
     fn test_anova() {
-        let data1 = create_series(vec![2.0, 3.0, 3.0, 5.0, 6.0]);
-        let data2 = create_series(vec![3.0, 4.0, 4.0, 6.0, 8.0]);
-        let data3 = create_series(vec![5.0, 6.0, 7.0, 8.0, 9.0]);
+        let data1 = vec![2.0, 3.0, 3.0, 5.0, 6.0];
+        let data2 = vec![3.0, 4.0, 4.0, 6.0, 8.0];
+        let data3 = vec![5.0, 6.0, 7.0, 8.0, 9.0];
 
-        let result = anova(&[&data1, &data2, &data3], 0.05).unwrap();
+        let result = anova(&[data1, data2, data3], 0.05).unwrap();
 
         let expected_f_statistic = 4.261;
         let expected_p_value = 0.039;
@@ -33,11 +27,11 @@ mod tests_anova {
 
     #[test]
     fn test_anova_no_rejection() {
-        let data1 = create_series(vec![2.0, 3.0, 4.0, 5.0, 6.0]);
-        let data2 = create_series(vec![3.0, 4.0, 5.0, 6.0, 7.0]);
-        let data3 = create_series(vec![4.0, 5.0, 6.0, 7.0, 8.0]);
+        let data1 = vec![2.0, 3.0, 4.0, 5.0, 6.0];
+        let data2 = vec![3.0, 4.0, 5.0, 6.0, 7.0];
+        let data3 = vec![4.0, 5.0, 6.0, 7.0, 8.0];
 
-        let result = anova(&[&data1, &data2, &data3], 0.05).unwrap();
+        let result = anova(&[data1, data2, data3], 0.05).unwrap();
 
         let expected_f_statistic = 2.0;
         let expected_p_value = 0.177;

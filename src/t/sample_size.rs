@@ -20,7 +20,8 @@ use statrs::distribution::{ContinuousCDF, StudentsT};
 ///
 /// # Example
 /// ```rust
-/// use hypors::{t_sample_size, TailType};
+/// use hypors::t::t_sample_size;
+/// use hypors::common::TailType;
 ///
 /// let effect_size = 0.5;
 /// let alpha = 0.05; // 5% significance level

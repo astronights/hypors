@@ -1,16 +1,16 @@
 //! # Student T Tests
 //!
-//! This module provides statistical t-test functionalities.
+//! The `t` module provides functionality for performing Student's t-tests.
 //!
-//! The `t` module encompasses both one-sample and two-sample t-tests,
-//! enabling users to perform hypothesis testing to compare means from sample data.
+//! T-tests are statistical tests used to determine if there is a significant difference
+//! between sample means. They are often used when the population standard deviation is unknown.
 //!
 //! ## Sample Size Calculation
 //!
 //! To calculate the required sample size for t-tests, you can use the following function:
 //! - `t_sample_size`: Calculates the necessary sample size for one-sample t-tests based on effect size, alpha, power, and standard deviation.
 //!
-//! ## Modules
+//! ## Submodules
 //!
 //! - `one_sample`: Contains functions for performing one-sample t-tests.
 //! - `two_sample`: Contains functions for performing paired and independent two-sample t-tests.
@@ -24,6 +24,11 @@
 //! - `t_test_paired`: Performs a paired two-sample t-test.
 //! - `t_sample_size`: Calculates the required sample size for one-sample t-tests.
 //!
+//! ## Example
+//! ```rust
+//! use hypors::t::{t_test, t_test_ind, t_test_paired, t_sample_size};
+//! ```
+
 pub mod one_sample;
 pub mod sample_size;
 pub mod two_sample;

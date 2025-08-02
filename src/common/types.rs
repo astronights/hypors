@@ -26,7 +26,7 @@ pub enum TailType {
 /// # Example
 ///
 /// ```rust
-/// use hypors::TestResult;
+/// use hypors::common::TestResult;
 ///
 /// let test_result = TestResult {
 ///     test_statistic: 2.5,

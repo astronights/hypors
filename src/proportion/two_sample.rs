@@ -1,74 +1,91 @@
-use crate::common::{calculate_ci, calculate_p, TailType, TestResult};
-use polars::prelude::*;
+use crate::common::{StatError, TailType, TestResult, calculate_ci, calculate_p};
 use statrs::distribution::Normal;
 
-/// Performs an independent two-sample proportion test on two unrelated samples.
+/// Performs an independent two-sample Z-test for proportions.
 ///
-/// This test assesses whether the proportions of successes in two independent samples are significantly different.
+/// This test evaluates whether the difference in proportions between two independent groups
+/// is statistically significant.
 ///
 /// # Arguments
 ///
-/// * `series1` - A `Series` containing the first set of sample data, where values are binary (1 for success, 0 for failure).
-/// * `series2` - A `Series` containing the second set of sample data, also binary (1 for success, 0 for failure).
-/// * `tail` - Specifies the type of tail for the test: `TailType::Left`, `TailType::Right`, or `TailType::Two`.
-/// * `alpha` - The significance level for the test (e.g., 0.05 for a 95% confidence level).
-/// * `pooled` - A boolean indicating whether to use pooled proportions for calculating the standard error.
+/// * `data1` - Iterator of binary values for the first group (e.g., 0/1, bool).
+/// * `data2` - Iterator of binary values for the second group.
+/// * `tail` - The type of tail (left, right, or two) for the test.
+/// * `alpha` - The significance level (e.g., 0.05).
+/// * `pooled` - Whether to use pooled proportions to calculate the standard error.
 ///
 /// # Returns
 ///
-/// Returns a `Result<TestResult, PolarsError>`, where:
-/// - `TestResult` contains the test statistic, p-value, confidence interval,
-///   null and alternative hypotheses, and a boolean indicating if the null hypothesis is rejected.
+/// A `TestResult` with the test statistic, p-value, confidence interval, null/alt hypotheses, and whether to reject null.
 ///
 /// # Errors
 ///
-/// Returns a `PolarsError` if any calculations fail, such as when computing the sample proportions.
+/// Returns `StatError` if:
+/// - Either sample is empty
+/// - Standard error is zero
+/// - Statistical computation fails
 ///
 /// # Example
 ///
 /// ```rust
-/// use polars::prelude::*;
-/// use hypors::{proportion::z_test_ind, TailType};
+/// use hypors::proportion::z_test_ind;
+/// use hypors::common::TailType;
 ///
-/// let series1 = Series::new("data1", &[1, 0, 1, 1, 0]);
-/// let series2 = Series::new("data2", &[0, 0, 1, 1, 1]);
-/// let tail = TailType::Two;
-/// let alpha = 0.05;
-/// let pooled = true; // Use pooled proportions
+/// let group1 = vec![1, 0, 1, 1, 0];
+/// let group2 = vec![0, 0, 1, 1, 1];
+/// let result = z_test_ind(group1.iter().copied(), group2.iter().copied(), TailType::Two, 0.05, true).unwrap();
 ///
-/// let result = z_test_ind(&series1, &series2, tail, alpha, pooled).unwrap();
-///
-/// assert!(result.p_value > 0.0 && result.p_value < 1.0);
-/// assert!(result.reject_null == (result.p_value < alpha));
+/// println!("Z Statistic: {}", result.test_statistic);
 /// ```
-pub fn z_test_ind(
-    series1: &Series,
-    series2: &Series,
+pub fn z_test_ind<I1, I2, T>(
+    data1: I1,
+    data2: I2,
     tail: TailType,
     alpha: f64,
     pooled: bool,
-) -> Result<TestResult, PolarsError> {
-    let n1 = series1.len() as f64;
-    let n2 = series2.len() as f64;
+) -> Result<TestResult, StatError>
+where
+    I1: IntoIterator<Item = T>,
+    I2: IntoIterator<Item = T>,
+    T: Into<f64>,
+{
+    let sample1: Vec<f64> = data1.into_iter().map(|x| x.into()).collect();
+    let sample2: Vec<f64> = data2.into_iter().map(|x| x.into()).collect();
 
-    let successes1 = series1.sum::<u32>().unwrap() as f64;
-    let successes2 = series2.sum::<u32>().unwrap() as f64;
+    if sample1.is_empty() || sample2.is_empty() {
+        return Err(StatError::EmptyData);
+    }
 
-    let p1 = successes1 / n1; // Sample proportion for the first group
-    let p2 = successes2 / n2; // Sample proportion for the second group
+    let n1 = sample1.len() as f64;
+    let n2 = sample2.len() as f64;
+
+    let successes1: f64 = sample1.iter().sum();
+    let successes2: f64 = sample2.iter().sum();
+
+    let p1 = successes1 / n1;
+    let p2 = successes2 / n2;
 
     let std_error = if pooled {
-        let pooled_proportion = (successes1 + successes2) / (n1 + n2);
-        (pooled_proportion * (1.0 - pooled_proportion) * (1.0 / n1 + 1.0 / n2)).sqrt()
+        let pooled_p = (successes1 + successes2) / (n1 + n2);
+        (pooled_p * (1.0 - pooled_p) * (1.0 / n1 + 1.0 / n2)).sqrt()
     } else {
         ((p1 * (1.0 - p1) / n1) + (p2 * (1.0 - p2) / n2)).sqrt()
     };
 
-    let test_statistic = (p1 - p2) / std_error;
-    let normal_dist = Normal::new(0.0, 1.0).expect("Failed to create Normal distribution");
+    if std_error == 0.0 {
+        return Err(StatError::ComputeError(
+            "Standard error is zero; cannot compute test statistic".to_string(),
+        ));
+    }
 
-    let p_value = calculate_p(test_statistic, tail.clone(), &normal_dist);
-    let confidence_interval = calculate_ci(p1 - p2, std_error, alpha, &normal_dist);
+    let test_statistic = (p1 - p2) / std_error;
+
+    let z_dist = Normal::new(0.0, 1.0).map_err(|e| {
+        StatError::ComputeError(format!("Failed to create Normal distribution: {e}"))
+    })?;
+
+    let p_value = calculate_p(test_statistic, tail.clone(), &z_dist);
+    let confidence_interval = calculate_ci(p1 - p2, std_error, alpha, &z_dist);
     let reject_null = p_value < alpha;
 
     let null_hypothesis = match tail {

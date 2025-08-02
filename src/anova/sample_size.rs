@@ -18,7 +18,7 @@ use statrs::distribution::{ContinuousCDF, FisherSnedecor};
 ///
 /// # Example
 /// ```rust
-/// use hypors::{f_sample_size};
+/// use hypors::anova::f_sample_size;
 ///
 /// let effect_size = 0.25; // Cohen's f
 /// let alpha = 0.05; // 5% significance level

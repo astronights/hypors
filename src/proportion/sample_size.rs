@@ -18,7 +18,7 @@ use statrs::distribution::{ContinuousCDF, Normal};
 ///
 /// # Example
 /// ```rust
-/// use hypors::{prop_sample_size};
+/// use hypors::proportion::prop_sample_size;
 ///
 /// let p1 = 0.4; // Expected proportion in group 1
 /// let p2 = 0.5; // Expected proportion in group 2
