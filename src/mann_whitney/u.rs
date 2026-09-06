@@ -138,11 +138,14 @@ where
     // (min(u1, u2) is sign-blind), with the 0.5 continuity
     // correction toward each tail; the two-sided p is clipped to 1
     // (scipy's default use_continuity=True). All observations tied
-    // leaves zero variance; scipy propagates NaN there (its z is 0/0
-    // before the continuity correction), and NaN never rejects the
-    // null, so constant subgroups keep working.
+    // leaves zero variance; scipy 1.18 subtracts a signed correction,
+    // so the two-sided z is 0/0 (NaN) while the one-sided tails still
+    // get -/+0.5 and evaluate the SF at an infinity, giving 1.0.
     let p_value = if variance_u <= 0.0 {
-        f64::NAN
+        match tail_type {
+            TailType::Two => f64::NAN,
+            _ => 1.0,
+        }
     } else {
         let sigma = variance_u.sqrt();
         match tail_type {

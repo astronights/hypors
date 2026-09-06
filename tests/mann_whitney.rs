@@ -124,6 +124,14 @@ mod tests_mann_whitney {
         assert!((result.test_statistic - 4.5).abs() < EPSILON);
         assert!(result.p_value.is_nan());
         assert!(!result.reject_null);
+
+        // One-sided tails subtract a signed 0.5, so their z is an
+        // infinity rather than 0/0: scipy 1.18 gives p = 1.0.
+        for tail in [TailType::Right, TailType::Left] {
+            let result = u_test(vec![2.0, 2.0, 2.0], vec![2.0, 2.0, 2.0], 0.05, tail).unwrap();
+            assert!((result.p_value - 1.0).abs() < EPSILON);
+            assert!(!result.reject_null);
+        }
     }
 
     #[test]
