@@ -8,6 +8,11 @@ repository = "https://github.com/astronights/hypors"
 description = "Hypothesis Testing with Rust"
 keywords = ["statistics", "hypothesis", "testing", "data", "p-value"]
 
+# Keep the published crate to the Rust library: the Python bindings
+# (hypopy, which carries its own manifest and pyproject.toml), their
+# tests, and the CI config are of no use to a crates.io consumer.
+exclude = [".github", "hypopy", "py_tests"]
+
 [lib]
 name = "hypors"
 path = "src/lib.rs" 
