@@ -5,6 +5,8 @@ use statrs::distribution::Normal;
 ///
 /// This test evaluates whether the distributions of two independent groups are
 /// equal by ranking all observations and comparing the sum of ranks for each group.
+/// The normal approximation uses the tie-corrected variance, matching
+/// `scipy.stats.mannwhitneyu`.
 ///
 /// # Arguments
 ///
@@ -75,9 +77,11 @@ where
     combined.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
     let mut rank_values = vec![0.0; combined.len()];
+    let mut tie_term = 0.0;
     let mut i = 0;
 
-    // Assign ranks with tie handling (average rank)
+    // Assign ranks with tie handling (average rank), accumulating the
+    // tie correction term sum(t^3 - t) for the variance below.
     while i < combined.len() {
         let start = i;
         let mut end = i;
@@ -90,6 +94,9 @@ where
         for v in rank_values.iter_mut().take(end + 1).skip(start) {
             *v = rank_avg;
         }
+
+        let t = (end - start + 1) as f64;
+        tie_term += t * t * t - t;
 
         i = end + 1;
     }
@@ -111,10 +118,16 @@ where
     let u2 = rank_sum2 - (n2 * (n2 + 1.0) / 2.0);
     let u_statistic = u1.min(u2);
 
-    // Calculate p-value using normal approximation
+    // Calculate p-value using the normal approximation with the
+    // tie-corrected variance:
+    //   sigma^2 = n1*n2/12 * ((N + 1) - sum(t^3 - t) / (N * (N - 1)))
     let total = n1 + n2;
     let mean_u = (n1 * n2) / 2.0;
-    let variance_u = (n1 * n2 * (total + 1.0)) / 12.0;
+    let variance_u = (n1 * n2 / 12.0) * ((total + 1.0) - tie_term / (total * (total - 1.0)));
+
+    if variance_u <= 0.0 {
+        return Err("All observations are tied; the Mann-Whitney U test is undefined.".to_string());
+    }
 
     let z = (u_statistic - mean_u) / variance_u.sqrt();
 
