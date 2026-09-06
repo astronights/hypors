@@ -51,6 +51,44 @@ mod tests_mann_whitney {
     }
 
     #[test]
+    fn test_u_test_one_sided_direction() {
+        // Group 1 is clearly larger: Right (greater) must be significant,
+        // Left (less) must not — one-sided tests are direction-sensitive.
+        let larger = vec![5.0, 6.0, 7.0, 8.0, 9.0];
+        let smaller = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let alpha = 0.05;
+
+        // scipy.stats.mannwhitneyu([5..9], [1..5], alternative="greater",
+        // method="asymptotic") -> p = 0.0079853482
+        let right = u_test(larger.clone(), smaller.clone(), alpha, TailType::Right).unwrap();
+        assert!((right.p_value - 0.0079853).abs() < EPSILON);
+        assert!(right.reject_null);
+
+        // scipy.stats.mannwhitneyu([5..9], [1..5], alternative="less",
+        // method="asymptotic") -> p = 0.9955920709
+        let left = u_test(larger, smaller, alpha, TailType::Left).unwrap();
+        assert!((left.p_value - 0.9955921).abs() < EPSILON);
+        assert!(!left.reject_null);
+    }
+
+    #[test]
+    fn test_u_test_one_sided_overlapping() {
+        let data1 = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let data2 = vec![3.0, 4.0, 5.0, 6.0, 7.0];
+        let alpha = 0.05;
+
+        // scipy.stats.mannwhitneyu([1..5], [3..7], alternative="greater",
+        // method="asymptotic") -> p = 0.9634301002
+        let right = u_test(data1.clone(), data2.clone(), alpha, TailType::Right).unwrap();
+        assert!((right.p_value - 0.9634301).abs() < EPSILON);
+
+        // scipy.stats.mannwhitneyu([1..5], [3..7], alternative="less",
+        // method="asymptotic") -> p = 0.0569231490
+        let left = u_test(data1, data2, alpha, TailType::Left).unwrap();
+        assert!((left.p_value - 0.0569231).abs() < EPSILON);
+    }
+
+    #[test]
     fn test_u_test_heavy_ties() {
         // Ties shrink the variance; the tie-corrected sigma must be used.
         let data1 = vec![1.0, 2.0, 2.0, 3.0, 3.0, 3.0];
