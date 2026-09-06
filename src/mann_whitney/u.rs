@@ -25,7 +25,10 @@ use statrs::distribution::{ContinuousCDF, Normal};
 /// # Returns
 ///
 /// Returns a `Result<TestResult, String>`, where `TestResult` contains:
-/// - `test_statistic`: The computed U statistic.
+/// - `test_statistic`: The computed U statistic, reported as `min(U1, U2)`
+///   (the classical tables convention). The p-value is computed from `U1`;
+///   scipy reports `U1` as its statistic, so compare p-values, not statistics,
+///   when checking against `scipy.stats.mannwhitneyu`.
 /// - `p_value`: The p-value for the test.
 /// - `confidence_interval`: Not applicable for U test, returns `(NaN, NaN)`.
 /// - `null_hypothesis`: The null hypothesis statement.
@@ -129,22 +132,24 @@ where
     let mean_u = (n1 * n2) / 2.0;
     let variance_u = (n1 * n2 / 12.0) * ((total + 1.0) - tie_term / (total * (total - 1.0)));
 
-    if variance_u <= 0.0 {
-        return Err("All observations are tied; the Mann-Whitney U test is undefined.".to_string());
-    }
-
-    let sigma = variance_u.sqrt();
-
     let dist = Normal::new(0.0, 1.0).map_err(|e| format!("Normal distribution error: {e}"))?;
 
     // p-values from u1 so one-sided tests keep their direction
     // (min(u1, u2) is sign-blind), with the 0.5 continuity
     // correction toward each tail; the two-sided p is clipped to 1
-    // (scipy's default use_continuity=True).
-    let p_value = match tail_type {
-        TailType::Right => 1.0 - dist.cdf((u1 - mean_u - 0.5) / sigma),
-        TailType::Left => dist.cdf((u1 - mean_u + 0.5) / sigma),
-        TailType::Two => (2.0 * (1.0 - dist.cdf(((u1 - mean_u).abs() - 0.5) / sigma))).min(1.0),
+    // (scipy's default use_continuity=True). All observations tied
+    // leaves zero variance; scipy propagates NaN there (its z is 0/0
+    // before the continuity correction), and NaN never rejects the
+    // null, so constant subgroups keep working.
+    let p_value = if variance_u <= 0.0 {
+        f64::NAN
+    } else {
+        let sigma = variance_u.sqrt();
+        match tail_type {
+            TailType::Right => 1.0 - dist.cdf((u1 - mean_u - 0.5) / sigma),
+            TailType::Left => dist.cdf((u1 - mean_u + 0.5) / sigma),
+            TailType::Two => (2.0 * (1.0 - dist.cdf(((u1 - mean_u).abs() - 0.5) / sigma))).min(1.0),
+        }
     };
 
     let reject_null = p_value < alpha;

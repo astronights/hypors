@@ -110,14 +110,20 @@ mod tests_mann_whitney {
 
     #[test]
     fn test_u_test_all_tied() {
-        // Zero variance (every observation identical) has no defined z.
+        // Zero variance (every observation identical): scipy
+        // propagates NaN (mannwhitneyu([2,2,2], [2,2,2],
+        // method="asymptotic") -> statistic 4.5, pvalue nan), and a
+        // NaN p-value never rejects the null.
         let result = u_test(
             vec![2.0, 2.0, 2.0],
             vec![2.0, 2.0, 2.0],
             0.05,
             TailType::Two,
-        );
-        assert!(result.is_err());
+        )
+        .unwrap();
+        assert!((result.test_statistic - 4.5).abs() < EPSILON);
+        assert!(result.p_value.is_nan());
+        assert!(!result.reject_null);
     }
 
     #[test]
