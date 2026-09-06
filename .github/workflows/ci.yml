@@ -31,11 +31,8 @@ jobs:
       - name: Formatting
         run: cargo fmt --check
 
-      # bool_assert_comparison is allowed only because the existing
-      # integration tests trip it 14 times; drop the -A once those are
-      # cleaned up so every clippy lint is a hard failure.
       - name: Clippy
-        run: cargo clippy --all-targets -- -D warnings -A clippy::bool_assert_comparison
+        run: cargo clippy --all-targets -- -D warnings
 
       # Plain `cargo test` on purpose: it runs the unit, integration and
       # doc tests. `--all-targets` would silently drop the doc tests.

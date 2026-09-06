@@ -22,7 +22,7 @@ mod tests_t_test {
 
         assert!((result.test_statistic - expected_t_statistic).abs() < EPSILON);
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
-        assert_eq!(result.reject_null, false);
+        assert!(!result.reject_null);
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 

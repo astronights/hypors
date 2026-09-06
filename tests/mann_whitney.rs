@@ -26,7 +26,7 @@ mod tests_mann_whitney {
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
-        assert_eq!(result.reject_null, false);
+        assert!(!result.reject_null);
     }
 
     #[test]
@@ -47,7 +47,7 @@ mod tests_mann_whitney {
         assert_eq!(result.null_hypothesis, expected_null_hypothesis);
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
-        assert_eq!(result.reject_null, false);
+        assert!(!result.reject_null);
     }
 
     #[test]
