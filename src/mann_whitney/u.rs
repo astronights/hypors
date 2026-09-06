@@ -1,10 +1,16 @@
-use crate::common::{TailType, TestResult, calculate_p};
-use statrs::distribution::Normal;
+use crate::common::{TailType, TestResult};
+use statrs::distribution::{ContinuousCDF, Normal};
 
 /// Perform the Mann-Whitney U Test for comparing two independent samples.
 ///
 /// This test evaluates whether the distributions of two independent groups are
 /// equal by ranking all observations and comparing the sum of ranks for each group.
+/// The p-value uses the normal approximation with the tie-corrected variance
+/// and a 0.5 continuity correction toward the tail, matching
+/// `scipy.stats.mannwhitneyu` with `method="asymptotic"` (scipy's default
+/// `use_continuity=True`). Note that the normal approximation is unreliable
+/// for very small samples (scipy switches to the exact distribution for
+/// small untied samples; this implementation does not yet).
 ///
 /// # Arguments
 ///
@@ -19,7 +25,10 @@ use statrs::distribution::Normal;
 /// # Returns
 ///
 /// Returns a `Result<TestResult, String>`, where `TestResult` contains:
-/// - `test_statistic`: The computed U statistic.
+/// - `test_statistic`: The computed U statistic, reported as `min(U1, U2)`
+///   (the classical tables convention). The p-value is computed from `U1`;
+///   scipy reports `U1` as its statistic, so compare p-values, not statistics,
+///   when checking against `scipy.stats.mannwhitneyu`.
 /// - `p_value`: The p-value for the test.
 /// - `confidence_interval`: Not applicable for U test, returns `(NaN, NaN)`.
 /// - `null_hypothesis`: The null hypothesis statement.
@@ -75,9 +84,11 @@ where
     combined.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
     let mut rank_values = vec![0.0; combined.len()];
+    let mut tie_term = 0.0;
     let mut i = 0;
 
-    // Assign ranks with tie handling (average rank)
+    // Assign ranks with tie handling (average rank), accumulating the
+    // tie correction term sum(t^3 - t) for the variance below.
     while i < combined.len() {
         let start = i;
         let mut end = i;
@@ -90,6 +101,9 @@ where
         for v in rank_values.iter_mut().take(end + 1).skip(start) {
             *v = rank_avg;
         }
+
+        let t = (end - start + 1) as f64;
+        tie_term += t * t * t - t;
 
         i = end + 1;
     }
@@ -111,15 +125,35 @@ where
     let u2 = rank_sum2 - (n2 * (n2 + 1.0) / 2.0);
     let u_statistic = u1.min(u2);
 
-    // Calculate p-value using normal approximation
+    // Calculate p-value using the normal approximation with the
+    // tie-corrected variance:
+    //   sigma^2 = n1*n2/12 * ((N + 1) - sum(t^3 - t) / (N * (N - 1)))
     let total = n1 + n2;
     let mean_u = (n1 * n2) / 2.0;
-    let variance_u = (n1 * n2 * (total + 1.0)) / 12.0;
-
-    let z = (u_statistic - mean_u) / variance_u.sqrt();
+    let variance_u = (n1 * n2 / 12.0) * ((total + 1.0) - tie_term / (total * (total - 1.0)));
 
     let dist = Normal::new(0.0, 1.0).map_err(|e| format!("Normal distribution error: {e}"))?;
-    let p_value = calculate_p(z, tail_type, &dist);
+
+    // p-values from u1 so one-sided tests keep their direction
+    // (min(u1, u2) is sign-blind), with the 0.5 continuity
+    // correction toward each tail; the two-sided p is clipped to 1
+    // (scipy's default use_continuity=True). All observations tied
+    // leaves zero variance; scipy 1.18 subtracts a signed correction,
+    // so the two-sided z is 0/0 (NaN) while the one-sided tails still
+    // get -/+0.5 and evaluate the SF at an infinity, giving 1.0.
+    let p_value = if variance_u <= 0.0 {
+        match tail_type {
+            TailType::Two => f64::NAN,
+            _ => 1.0,
+        }
+    } else {
+        let sigma = variance_u.sqrt();
+        match tail_type {
+            TailType::Right => 1.0 - dist.cdf((u1 - mean_u - 0.5) / sigma),
+            TailType::Left => dist.cdf((u1 - mean_u + 0.5) / sigma),
+            TailType::Two => (2.0 * (1.0 - dist.cdf(((u1 - mean_u).abs() - 0.5) / sigma))).min(1.0),
+        }
+    };
 
     let reject_null = p_value < alpha;
 
