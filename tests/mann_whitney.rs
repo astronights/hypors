@@ -14,10 +14,9 @@ mod tests_mann_whitney {
         let result = u_test(data1, data2, alpha, TailType::Two).unwrap();
 
         // scipy.stats.mannwhitneyu([1,2,3,4,5], [3,4,5,6,7],
-        // alternative="two-sided", method="asymptotic",
-        // use_continuity=False) -> p = 0.0916902815
+        // alternative="two-sided", method="asymptotic") -> p = 0.1138462980
         let expected_u_statistic = 4.5;
-        let expected_p_value = 0.0916903;
+        let expected_p_value = 0.1138463;
         let expected_null_hypothesis = "H0: The distributions of both groups are equal.";
         let expected_alt_hypothesis = "Ha: The distributions of both groups are not equal.";
 
@@ -61,10 +60,10 @@ mod tests_mann_whitney {
         let result = u_test(data1, data2, alpha, TailType::Two).unwrap();
 
         // scipy.stats.mannwhitneyu([1,2,2,3,3,3], [2,3,3,4,4,5],
-        // alternative="two-sided", method="asymptotic",
-        // use_continuity=False) -> U1 = 7.0, p = 0.0652065157
+        // alternative="two-sided", method="asymptotic")
+        // -> U1 = 7.0, p = 0.0784029345
         let expected_u_statistic = 7.0; // min(U1, U2) = min(7, 29)
-        let expected_p_value = 0.0652065;
+        let expected_p_value = 0.0784029;
 
         assert!((result.test_statistic - expected_u_statistic).abs() < EPSILON);
         assert!((result.p_value - expected_p_value).abs() < EPSILON);

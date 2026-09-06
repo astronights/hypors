@@ -1,12 +1,14 @@
 use crate::common::{TailType, TestResult, calculate_p};
-use statrs::distribution::Normal;
+use statrs::distribution::{ContinuousCDF, Normal};
 
 /// Perform the Mann-Whitney U Test for comparing two independent samples.
 ///
 /// This test evaluates whether the distributions of two independent groups are
 /// equal by ranking all observations and comparing the sum of ranks for each group.
-/// The normal approximation uses the tie-corrected variance, matching
-/// `scipy.stats.mannwhitneyu`.
+/// The normal approximation uses the tie-corrected variance; the two-sided
+/// p-value additionally applies a 0.5 continuity correction and is clipped
+/// to 1, matching `scipy.stats.mannwhitneyu` with `method="asymptotic"`
+/// (scipy's default `use_continuity=True`).
 ///
 /// # Arguments
 ///
@@ -129,10 +131,20 @@ where
         return Err("All observations are tied; the Mann-Whitney U test is undefined.".to_string());
     }
 
-    let z = (u_statistic - mean_u) / variance_u.sqrt();
+    let sigma = variance_u.sqrt();
 
     let dist = Normal::new(0.0, 1.0).map_err(|e| format!("Normal distribution error: {e}"))?;
-    let p_value = calculate_p(z, tail_type, &dist);
+
+    // 0.5 continuity correction toward the tail for the two-sided
+    // p-value, clipped to 1 (scipy's default use_continuity=True).
+    // One-sided p-values are corrected in the direction fix that
+    // follows.
+    let p_value = match tail_type {
+        TailType::Two => {
+            (2.0 * (1.0 - dist.cdf(((u_statistic - mean_u).abs() - 0.5) / sigma))).min(1.0)
+        }
+        tail => calculate_p((u_statistic - mean_u) / sigma, tail, &dist),
+    };
 
     let reject_null = p_value < alpha;
 
