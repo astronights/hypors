@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: Test and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Formatting
+        run: cargo fmt --check
+
+      # bool_assert_comparison is allowed only because the existing
+      # integration tests trip it 14 times; drop the -A once those are
+      # cleaned up so every clippy lint is a hard failure.
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings -A clippy::bool_assert_comparison
+
+      # Plain `cargo test` on purpose: it runs the unit, integration and
+      # doc tests. `--all-targets` would silently drop the doc tests.
+      - name: Tests
+        run: cargo test
+
+      - name: Package
+        run: cargo package
