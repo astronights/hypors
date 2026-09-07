@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests_mann_whitney {
-    use hypors::common::TailType;
+    use hypors::common::{StatError, TailType};
     use hypors::mann_whitney::u_test;
 
     const EPSILON: f64 = 0.0001; // For floating-point comparisons
@@ -137,7 +137,19 @@ mod tests_mann_whitney {
     #[test]
     fn test_u_test_empty_group() {
         let empty: Vec<f64> = vec![];
-        let result = u_test(empty, vec![1.0, 2.0], 0.05, TailType::Two);
-        assert!(result.is_err());
+
+        // Either group being empty is EmptyData, whichever side it is on.
+        assert_eq!(
+            u_test(empty.clone(), vec![1.0, 2.0], 0.05, TailType::Two).unwrap_err(),
+            StatError::EmptyData
+        );
+        assert_eq!(
+            u_test(vec![1.0, 2.0], empty.clone(), 0.05, TailType::Two).unwrap_err(),
+            StatError::EmptyData
+        );
+        assert_eq!(
+            u_test(empty.clone(), empty, 0.05, TailType::Two).unwrap_err(),
+            StatError::EmptyData
+        );
     }
 }

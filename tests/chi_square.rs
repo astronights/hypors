@@ -4,7 +4,7 @@ mod tests_chi_square {
         chi2_sample_size_gof, chi2_sample_size_ind, chi2_sample_size_variance, goodness_of_fit,
         independence, variance,
     };
-    use hypors::common::TailType;
+    use hypors::common::{StatError, TailType};
 
     const EPSILON: f64 = 0.001; // Tolerance for floating-point comparisons
 
@@ -28,6 +28,32 @@ mod tests_chi_square {
         assert_eq!(result.alt_hypothesis, expected_alt_hypothesis);
 
         assert!(!result.reject_null);
+    }
+
+    #[test]
+    fn test_variance_errors() {
+        let empty: Vec<f64> = vec![];
+
+        // No data at all is distinct from too little data.
+        assert_eq!(
+            variance(empty, 5.0, TailType::Two, 0.05).unwrap_err(),
+            StatError::EmptyData
+        );
+
+        // The sample variance needs at least two observations.
+        assert_eq!(
+            variance(vec![1.0], 5.0, TailType::Two, 0.05).unwrap_err(),
+            StatError::InsufficientData
+        );
+
+        // A population variance that is not positive and finite has no
+        // valid chi-square statistic.
+        for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+            match variance(vec![1.0, 2.0, 3.0], bad, TailType::Two, 0.05).unwrap_err() {
+                StatError::ComputeError(msg) => assert!(msg.contains("positive finite")),
+                other => panic!("expected ComputeError for pop_variance {bad}, got {other}"),
+            }
+        }
     }
 
     #[test]
