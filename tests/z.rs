@@ -23,7 +23,7 @@ mod tests_z_test {
 
         assert!((result.test_statistic - expected_z_statistic).abs() < EPSILON);
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
-        assert_eq!(result.reject_null, false);
+        assert!(!result.reject_null);
 
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
@@ -50,7 +50,7 @@ mod tests_z_test {
 
         assert!((result.test_statistic - expected_z_statistic).abs() < EPSILON);
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
-        assert_eq!(result.reject_null, false);
+        assert!(!result.reject_null);
 
         println!("{} {}", result.confidence_interval.0, expected_ci_lower);
         println!("{} {}", result.confidence_interval.1, expected_ci_upper);
@@ -81,7 +81,7 @@ mod tests_z_test {
 
         assert!((result.test_statistic - expected_z_statistic).abs() < EPSILON);
         assert!((result.p_value - expected_p_value).abs() < EPSILON);
-        assert_eq!(result.reject_null, false);
+        assert!(!result.reject_null);
 
         assert!((result.confidence_interval.0 - expected_ci_lower).abs() < EPSILON);
         assert!((result.confidence_interval.1 - expected_ci_upper).abs() < EPSILON);
