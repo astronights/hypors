@@ -68,13 +68,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          notes="${RUNNER_TEMP:-/tmp}/release-notes.md"
           awk -v tag="${GITHUB_REF_NAME#v}" '
             $0 ~ "^## \\[" tag "\\]" { found = 1; next }
             found && /^## \[/ { exit }
             found { print }
-          ' CHANGELOG.md > release-notes.md
-          if [ -s release-notes.md ]; then
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file release-notes.md
+          ' CHANGELOG.md > "$notes"
+          # The tag may arrive either from `git push origin vX.Y.Z`, where no
+          # release exists yet, or from "Draft a new release" in the UI, which
+          # creates the tag and the release together. Handle both: `gh release
+          # create` fails outright on an existing release.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            if [ -s "$notes" ]; then
+              gh release edit "$GITHUB_REF_NAME" --notes-file "$notes"
+            else
+              echo "No CHANGELOG section for $GITHUB_REF_NAME; leaving the existing notes alone."
+            fi
+          elif [ -s "$notes" ]; then
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$notes"
           else
             gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
           fi
