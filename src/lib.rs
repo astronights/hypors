@@ -1,6 +1,6 @@
 //! # HypoRS: A Statistical Hypothesis Testing Library
 //!
-//! `hypors` is a Rust library designed for performing a variety of hypothesis tests, including t-tests, z-tests, proportion tests, ANOVA, Chi-square tests, and Mann-Whitney tests. This library utilizes the `polars` crate for data manipulation and the `statrs` crate for statistical distributions.
+//! `hypors` is a Rust library designed for performing a variety of hypothesis tests, including t-tests, z-tests, proportion tests, ANOVA, Chi-square tests, and Mann-Whitney tests. It operates on `Vec`s, arrays and iterators of numeric types, and uses the `statrs` crate for statistical distributions.
 //!
 //! ## Overview
 //!
@@ -183,7 +183,10 @@
 //!
 //! ## Error Handling
 //!
-//! The library uses `PolarsError` to handle errors that arise during data manipulation (e.g., failure to compute mean or variance). Each test function returns a `Result<TestResult, PolarsError>` type, where `TestResult` encapsulates the outcome of the hypothesis test.
+//! Most test functions return `Result<TestResult, StatError>`, where `StatError`
+//! covers empty input, insufficient data and computation failures, and `TestResult`
+//! encapsulates the outcome of the hypothesis test. `mann_whitney::u_test` and
+//! `chi_square::variance` currently return `Result<TestResult, String>` instead.
 //!
 //! ## License
 //!
