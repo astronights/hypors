@@ -1,4 +1,4 @@
-use crate::common::{TailType, TestResult, calculate_chi2_ci, calculate_p};
+use crate::common::{StatError, TailType, TestResult, calculate_chi2_ci, calculate_p};
 use statrs::distribution::ChiSquared;
 use std::f64;
 
@@ -15,7 +15,7 @@ use std::f64;
 ///
 /// # Returns
 ///
-/// Returns a `Result<TestResult, String>`, where `TestResult` contains:
+/// Returns a `Result<TestResult, StatError>`, where `TestResult` contains:
 /// - `test_statistic`: The calculated Chi-Square test statistic.
 /// - `p_value`: The p-value associated with the test statistic.
 /// - `confidence_interval`: The confidence interval for the population variance.
@@ -43,7 +43,7 @@ pub fn variance<I, T>(
     pop_variance: f64,
     tail: TailType,
     alpha: f64,
-) -> Result<TestResult, String>
+) -> Result<TestResult, StatError>
 where
     I: IntoIterator<Item = T>,
     T: Into<f64>,
@@ -53,12 +53,19 @@ where
 
     let n = sample_data.len();
 
+    if sample_data.is_empty() {
+        return Err(StatError::EmptyData);
+    }
+
+    // The sample variance needs at least two points.
     if n < 2 {
-        return Err("Sample size must be at least 2.".to_string());
+        return Err(StatError::InsufficientData);
     }
 
     if !pop_variance.is_finite() || pop_variance <= 0.0 {
-        return Err("Population variance must be a positive finite number.".to_string());
+        return Err(StatError::ComputeError(
+            "Population variance must be a positive finite number".to_string(),
+        ));
     }
 
     let mean = sample_data.iter().sum::<f64>() / n as f64;
@@ -67,7 +74,8 @@ where
 
     let test_statistic = (n as f64 - 1.0) * sample_variance / pop_variance;
     let df = n as f64 - 1.0;
-    let chi_distribution = ChiSquared::new(df).map_err(|e| format!("Chi-squared error: {e}"))?;
+    let chi_distribution = ChiSquared::new(df)
+        .map_err(|e| StatError::ComputeError(format!("Chi-squared distribution error: {e}")))?;
 
     let p_value = calculate_p(test_statistic, tail.clone(), &chi_distribution);
     let reject_null = p_value < alpha;

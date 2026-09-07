@@ -1,4 +1,4 @@
-use crate::common::{TailType, TestResult};
+use crate::common::{StatError, TailType, TestResult};
 use statrs::distribution::{ContinuousCDF, Normal};
 
 /// Perform the Mann-Whitney U Test for comparing two independent samples.
@@ -24,7 +24,7 @@ use statrs::distribution::{ContinuousCDF, Normal};
 ///
 /// # Returns
 ///
-/// Returns a `Result<TestResult, String>`, where `TestResult` contains:
+/// Returns a `Result<TestResult, StatError>`, where `TestResult` contains:
 /// - `test_statistic`: The computed U statistic, reported as `min(U1, U2)`
 ///   (the classical tables convention). The p-value is computed from `U1`;
 ///   scipy reports `U1` as its statistic, so compare p-values, not statistics,
@@ -56,7 +56,7 @@ pub fn u_test<I, J, T, U>(
     data2: J,
     alpha: f64,
     tail_type: TailType,
-) -> Result<TestResult, String>
+) -> Result<TestResult, StatError>
 where
     I: IntoIterator<Item = T>,
     J: IntoIterator<Item = U>,
@@ -77,7 +77,7 @@ where
     let n2 = combined.iter().filter(|(_, g)| *g == 2).count() as f64;
 
     if n1 == 0.0 || n2 == 0.0 {
-        return Err("Both groups must contain at least one observation.".to_string());
+        return Err(StatError::EmptyData);
     }
 
     // Sort combined by value
@@ -132,7 +132,9 @@ where
     let mean_u = (n1 * n2) / 2.0;
     let variance_u = (n1 * n2 / 12.0) * ((total + 1.0) - tie_term / (total * (total - 1.0)));
 
-    let dist = Normal::new(0.0, 1.0).map_err(|e| format!("Normal distribution error: {e}"))?;
+    let dist = Normal::new(0.0, 1.0).map_err(|e| {
+        StatError::ComputeError(format!("Failed to create Normal distribution: {e}"))
+    })?;
 
     // p-values from u1 so one-sided tests keep their direction
     // (min(u1, u2) is sign-blind), with the 0.5 continuity

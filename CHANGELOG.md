@@ -28,6 +28,12 @@ a dependency on `0.3` will not resolve to `0.4`.
 - `test_statistic` is documented explicitly as `min(U1, U2)` while the
   p-value derives from `U1`, so compare p-values rather than statistics
   when checking against scipy.
+- **`mann_whitney::u_test` and `chi_square::variance` now return
+  `Result<TestResult, StatError>`** instead of `Result<TestResult, String>`,
+  matching every other test in the crate. Code matching on the error needs
+  updating; code using `?` or `unwrap()` does not. Empty input now yields
+  `StatError::EmptyData`, too few observations `StatError::InsufficientData`,
+  and distribution failures `StatError::ComputeError`.
 
 ### Added
 

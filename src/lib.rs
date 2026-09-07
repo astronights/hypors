@@ -183,10 +183,10 @@
 //!
 //! ## Error Handling
 //!
-//! Most test functions return `Result<TestResult, StatError>`, where `StatError`
-//! covers empty input, insufficient data and computation failures, and `TestResult`
-//! encapsulates the outcome of the hypothesis test. `mann_whitney::u_test` and
-//! `chi_square::variance` currently return `Result<TestResult, String>` instead.
+//! Every test function returns `Result<TestResult, StatError>`. `StatError` covers
+//! empty input (`EmptyData`), too few observations for the test (`InsufficientData`)
+//! and computation failures such as a distribution that could not be constructed
+//! (`ComputeError`). `TestResult` encapsulates the outcome of the hypothesis test.
 //!
 //! ## License
 //!
