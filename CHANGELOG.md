@@ -6,6 +6,12 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 While this crate is pre-1.0, the **minor** version carries breaking changes:
 a dependency on `0.3` will not resolve to `0.4`.
 
+## [Unreleased]
+
+Nothing yet. Add entries here as they land; move them under a new version
+heading when releasing, since the release workflow takes its GitHub Release
+notes from the section matching the tag.
+
 ## [0.4.0] - 2026-09-07
 
 ### Changed
