@@ -8,9 +8,27 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ## [Unreleased]
 
-Nothing yet. Add entries here as they land; move them under a new version
-heading when releasing, since the release workflow takes its GitHub Release
-notes from the section matching the tag.
+### Added
+
+- **Python bindings** (`python/`), published to PyPI as `hypors` and versioned
+  in lockstep with this crate. All 20 public test and sample-size functions are
+  exposed across `hypors.t`, `hypors.z`, `hypors.proportion`, `hypors.anova`,
+  `hypors.chi_square` and `hypors.mann_whitney`, with `TailType` and
+  `TestResult` in `hypors.common` and at the top level.
+  - Any Python iterable of numbers is accepted — list, tuple, generator,
+    `numpy` array, `pandas`/`polars` Series — and the package depends on none
+    of them.
+  - `StatError` surfaces as `ValueError` for empty or insufficient data and
+    `RuntimeError` for a failed computation.
+  - The pytest suite asserts the same fixture values as the Rust integration
+    tests, so both layers are held to the scipy-verified numbers.
+- CI builds the wheel, lints the binding crate and runs the Python suite.
+
+### Changed
+
+- The crate no longer builds a `cdylib`. It was a leftover from an earlier
+  attempt at putting the bindings in this crate, produced a `libhypors.so`
+  nothing consumed, and collided with the extension module's output filename.
 
 ## [0.4.0] - 2026-09-07
 

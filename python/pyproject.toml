@@ -1,0 +1,28 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "hypors"
+version = "0.4.0"
+description = "Hypothesis testing for Python, backed by the hypors Rust crate"
+readme = "README.md"
+authors = [{ name = "Shubhankar Agrawal", email = "shubhankar.a31@gmail.com" }]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.8"
+keywords = ["statistics", "hypothesis", "testing", "p-value"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Repository = "https://github.com/astronights/hypors"
+Changelog = "https://github.com/astronights/hypors/blob/main/CHANGELOG.md"
+
+[tool.maturin]
+manifest-path = "Cargo.toml"
+features = ["pyo3/extension-module"]
