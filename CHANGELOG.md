@@ -10,7 +10,7 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ### Added
 
-- **Python bindings** (`hypopy/`), published to PyPI as `hypors` and versioned
+- **Python bindings** (`python/`), published to PyPI as `hypors` and versioned
   in lockstep with this crate. All 20 public test and sample-size functions are
   exposed across `hypors.t`, `hypors.z`, `hypors.proportion`, `hypors.anova`,
   `hypors.chi_square` and `hypors.mann_whitney`, with `TailType` and
