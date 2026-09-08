@@ -17,7 +17,7 @@ exclude = [".github", "hypopy", "py_tests"]
 [lib]
 name = "hypors"
 path = "src/lib.rs" 
-crate-type = ["cdylib", "lib"]
+crate-type = ["lib"]
 
 [dependencies]
 serde = {version = ">=1.0.210", features = ["derive"]}

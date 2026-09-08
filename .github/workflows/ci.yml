@@ -45,3 +45,39 @@ jobs:
         run: |
           cargo package
           rm -rf target/package
+
+  python:
+    name: Python bindings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # numpy and polars are not dependencies of the package; they are
+      # installed so the tests can prove their arrays work by being iterable.
+      - name: Tooling
+        run: python -m pip install --upgrade pip maturin pytest numpy polars
+
+      # hypopy is not a workspace member, so the checks above do not reach it.
+      - name: Formatting
+        run: cargo fmt --check --manifest-path hypopy/Cargo.toml
+
+      - name: Clippy
+        run: cargo clippy --manifest-path hypopy/Cargo.toml --all-targets -- -D warnings
+
+      - name: Build and install the wheel
+        working-directory: hypopy
+        run: |
+          maturin build --interpreter python
+          python -m pip install --force-reinstall target/wheels/*.whl
+          rm -rf target/wheels
+
+      - name: Tests
+        run: python -m pytest py_tests -q
