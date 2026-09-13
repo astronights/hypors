@@ -1,17 +1,26 @@
 name: Release
 
-# Tags only — never a merge to main. A crates.io publish cannot be undone
-# (a version can be yanked but never replaced), so releasing stays a
-# deliberate act rather than a side effect of merging.
+# Tags only — never a merge to main. A publish cannot be undone (a version
+# can be yanked but never replaced or reused on either registry), so
+# releasing stays a deliberate act rather than a side effect of merging.
+#
+# workflow_dispatch exists so an existing tag can be re-run: the registries
+# are handled independently, and either may already hold the version.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release, e.g. v0.4.0"
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
 env:
@@ -21,22 +30,42 @@ jobs:
   verify:
     name: Verify tag and test
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      version: ${{ steps.resolve.outputs.version }}
     steps:
+      - id: resolve
+        run: |
+          tag="${{ inputs.tag || github.ref_name }}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.resolve.outputs.tag }}
 
       - uses: dtolnay/rust-toolchain@stable
 
-      # A tag that disagrees with the manifest would publish the wrong
-      # version or fail halfway through the release, so check it first.
-      - name: Tag matches Cargo.toml version
+      # All three manifests carry the version, and they are meant to move in
+      # lockstep. A tag that disagrees with any of them would publish the
+      # wrong version or fail halfway through, so check before doing anything.
+      - name: Versions agree with the tag
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
         run: |
-          manifest="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
-          tag="${GITHUB_REF_NAME#v}"
-          echo "manifest=$manifest tag=$tag"
-          if [ "$manifest" != "$tag" ]; then
-            echo "::error::tag $GITHUB_REF_NAME does not match Cargo.toml version $manifest"
-            exit 1
-          fi
+          crate="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
+          binding="$(cargo metadata --no-deps --format-version 1 --manifest-path python/Cargo.toml | jq -r '.packages[0].version')"
+          pyproject="$(grep -m1 '^version = ' python/pyproject.toml | cut -d'"' -f2)"
+          echo "tag=$VERSION crate=$crate binding=$binding pyproject=$pyproject"
+          status=0
+          for pair in "Cargo.toml:$crate" "python/Cargo.toml:$binding" "python/pyproject.toml:$pyproject"; do
+            name="${pair%%:*}"; value="${pair#*:}"
+            if [ "$value" != "$VERSION" ]; then
+              echo "::error::$name is $value but the tag is $VERSION"
+              status=1
+            fi
+          done
+          exit $status
 
       - name: Tests
         run: cargo test
@@ -44,32 +73,145 @@ jobs:
       - name: Package
         run: cargo package
 
-  publish:
+  publish-crate:
     name: Publish to crates.io
     needs: verify
     runs-on: ubuntu-latest
     # The crates-io environment holds CARGO_REGISTRY_TOKEN and a required
-    # reviewer, so this job waits for a human to approve the deployment and
-    # no other job can read the token.
+    # reviewer, so this waits for a human and no other job can read the token.
     environment: crates-io
-    permissions:
-      contents: write # creating the GitHub Release
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
 
       - uses: dtolnay/rust-toolchain@stable
 
+      # A version already on crates.io can never be replaced, so re-running a
+      # release must skip rather than fail: the other registry may still need
+      # publishing.
+      - id: check
+        name: Already published?
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          code="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H 'User-Agent: hypors-release' \
+            "https://crates.io/api/v1/crates/hypors/$VERSION")"
+          if [ "$code" = "200" ]; then
+            echo "crates.io already has $VERSION; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish
+        if: steps.check.outputs.skip == 'false'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish
 
-      - name: GitHub Release
+  wheels:
+    name: Wheel (${{ matrix.platform }} ${{ matrix.target }})
+    needs: verify
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux, runner: ubuntu-latest, target: x86_64 }
+          - { platform: linux, runner: ubuntu-latest, target: aarch64 }
+          - { platform: macos, runner: macos-latest, target: x86_64 }
+          - { platform: macos, runner: macos-latest, target: aarch64 }
+          - { platform: windows, runner: windows-latest, target: x64 }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # abi3 means one wheel per platform covers Python 3.8+, so the matrix
+      # only has to cover operating systems and architectures.
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --manifest-path python/Cargo.toml
+          manylinux: auto
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.platform }}-${{ matrix.target }}
+          path: dist
+
+  sdist:
+    name: Source distribution
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
+
+      # The sdist has to carry the parent crate too: python/Cargo.toml depends
+      # on it by path, so a build from source needs both.
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist --manifest-path python/Cargo.toml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+  publish-pypi:
+    name: Publish to PyPI
+    # Every wheel must exist before anything is uploaded, so a broken platform
+    # fails the release rather than half-publishing it.
+    needs: [verify, wheels, sdist]
+    runs-on: ubuntu-latest
+    # The pypi environment holds PYPI_API_TOKEN and a required reviewer.
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*"
+          path: dist
+          merge-multiple: true
+
+      - name: List what will be uploaded
+        run: ls -l dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: dist
+          # Re-running a release must not fail on files the registry already
+          # has, for the same reason the crates.io step skips.
+          skip-existing: true
+
+  github-release:
+    name: GitHub Release
+    needs: [verify, publish-crate, publish-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
+
+      - name: Notes from the changelog
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.verify.outputs.tag }}
+          VERSION: ${{ needs.verify.outputs.version }}
         run: |
           notes="${RUNNER_TEMP:-/tmp}/release-notes.md"
-          awk -v tag="${GITHUB_REF_NAME#v}" '
+          awk -v tag="$VERSION" '
             $0 ~ "^## \\[" tag "\\]" { found = 1; next }
             found && /^## \[/ { exit }
             found { print }
@@ -78,14 +220,14 @@ jobs:
           # release exists yet, or from "Draft a new release" in the UI, which
           # creates the tag and the release together. Handle both: `gh release
           # create` fails outright on an existing release.
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+          if gh release view "$TAG" >/dev/null 2>&1; then
             if [ -s "$notes" ]; then
-              gh release edit "$GITHUB_REF_NAME" --notes-file "$notes"
+              gh release edit "$TAG" --notes-file "$notes"
             else
-              echo "No CHANGELOG section for $GITHUB_REF_NAME; leaving the existing notes alone."
+              echo "No CHANGELOG section for $TAG; leaving the existing notes alone."
             fi
           elif [ -s "$notes" ]; then
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$notes"
+            gh release create "$TAG" --title "$TAG" --notes-file "$notes"
           else
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+            gh release create "$TAG" --title "$TAG" --generate-notes
           fi

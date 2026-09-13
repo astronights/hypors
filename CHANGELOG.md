@@ -23,6 +23,12 @@ a dependency on `0.3` will not resolve to `0.4`.
   - The pytest suite asserts the same fixture values as the Rust integration
     tests, so both layers are held to the scipy-verified numbers.
 - CI builds the wheel, lints the binding crate and runs the Python suite.
+- The release workflow now publishes both registries from one `vX.Y.Z` tag:
+  wheels for Linux, macOS and Windows plus a source distribution go to PyPI
+  behind the `pypi` environment, alongside the existing crates.io publish.
+  Each registry is skipped if it already holds the version, so a release can
+  be re-run, and `workflow_dispatch` allows running against an existing tag.
+  The version guard now checks all three manifests agree with the tag.
 
 ### Changed
 
