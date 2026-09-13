@@ -5,6 +5,9 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
+/// The arguments `TestResult.__new__` takes, in order.
+type TestResultArgs = (f64, f64, (f64, f64), String, String, bool);
+
 /// Which tail of the distribution a test is run against.
 #[pyclass(eq, eq_int, frozen, from_py_object, module = "hypors.common")]
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -134,7 +137,7 @@ impl TestResult {
 
     // A result is exactly the sort of value that gets cached to disk or sent
     // between processes, so it has to survive pickle and copy.
-    fn __reduce__(slf: &Bound<'_, Self>) -> PyResult<(Py<PyAny>, (f64, f64, (f64, f64), String, String, bool))> {
+    fn __reduce__(slf: &Bound<'_, Self>) -> PyResult<(Py<PyAny>, TestResultArgs)> {
         let cls = slf.as_any().get_type().unbind().into_any();
         let r = slf.get();
         Ok((
