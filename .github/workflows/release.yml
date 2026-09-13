@@ -40,7 +40,7 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ steps.resolve.outputs.tag }}
 
@@ -93,7 +93,7 @@ jobs:
     # reviewer, so this waits for a human and no other job can read the token.
     environment: crates-io
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.verify.outputs.tag }}
 
@@ -137,7 +137,7 @@ jobs:
           - { platform: macos, runner: macos-latest, target: aarch64 }
           - { platform: windows, runner: windows-latest, target: x64 }
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.verify.outputs.tag }}
 
@@ -163,7 +163,7 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.verify.outputs.tag }}
 
@@ -212,7 +212,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.verify.outputs.tag }}
 
