@@ -1,0 +1,28 @@
+name: Feature request
+description: A test, statistic, or capability that is missing
+labels: ["enhancement"]
+body:
+  - type: input
+    id: what
+    attributes:
+      label: What is missing?
+      placeholder: "Wilcoxon signed-rank test"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: Definition
+      description: |
+        Which form of it, and where it is specified — a textbook, a paper, or
+        an existing implementation whose results should agree. Anything added
+        here has to be checkable against something.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use
+    attributes:
+      label: What would you use it for?
+      description: Optional, but it helps with the shape of the API.

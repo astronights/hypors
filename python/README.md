@@ -62,6 +62,22 @@ Errors surface as ordinary Python exceptions: `ValueError` for empty or
 insufficient data, `RuntimeError` for a computation that could not be
 completed.
 
+## Types
+
+The package ships `py.typed` and inline stubs, so editors and type checkers
+see the full API without any extra install:
+
+```python
+from hypors import TailType, TestResult
+from hypors.t import t_test
+
+result: TestResult = t_test([1.0, 2.0, 3.0], 2.0, TailType.Two, 0.05)
+p: float = result.p_value
+```
+
+Any iterable of numbers is accepted wherever data is taken — lists, tuples,
+generators, `numpy` arrays, `polars` series.
+
 ## Notes
 
 - The Mann-Whitney U p-value matches `scipy.stats.mannwhitneyu` with

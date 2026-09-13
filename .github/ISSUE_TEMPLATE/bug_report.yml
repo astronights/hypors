@@ -1,0 +1,58 @@
+name: Bug report
+description: A result that looks wrong, or an error that should not happen
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a numerical disagreement, the comparison matters more than
+        anything else here — it is what makes the report reproducible.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which package?
+      options:
+        - The Rust crate (crates.io)
+        - The Python package (PyPI)
+        - Both
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`hypors = \"...\"` in Cargo.toml, or `hypors.__version__`."
+      placeholder: "0.4.1"
+    validations:
+      required: true
+
+  - type: input
+    id: function
+    attributes:
+      label: Function
+      placeholder: "hypors::mann_whitney::u_test"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Input and code
+      description: |
+        The smallest call that shows it, in a code block. Include the data.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual
+      description: |
+        What you got, and what you expected instead. If another tool
+        disagrees, say which and give its output — scipy, R, Stata, a
+        textbook worked example. Name the exact call, since defaults differ
+        (`scipy.stats.mannwhitneyu(..., method="asymptotic")`, say).
+    validations:
+      required: true

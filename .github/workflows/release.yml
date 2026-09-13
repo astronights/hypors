@@ -33,6 +33,7 @@ jobs:
     outputs:
       tag: ${{ steps.resolve.outputs.tag }}
       version: ${{ steps.resolve.outputs.version }}
+      crate_published: ${{ steps.published.outputs.crate_published }}
     steps:
       - id: resolve
         run: |
@@ -85,9 +86,33 @@ jobs:
       - name: Package
         run: cargo package
 
+      # A version already on crates.io can never be replaced, so a re-run has
+      # to skip rather than fail. Asking here rather than inside publish-crate
+      # means an already-published version never waits on a human to approve
+      # a no-op. Anything other than a clear 200 leaves publish-crate to run
+      # and let cargo be the one to refuse.
+      - id: published
+        name: Already on crates.io?
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          code="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H 'User-Agent: hypors-release' \
+            "https://crates.io/api/v1/crates/hypors/$VERSION" || echo 000)"
+          echo "crates.io answered $code for $VERSION"
+          if [ "$code" = "200" ]; then
+            echo "crate_published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "crate_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
   publish-crate:
     name: Publish to crates.io
     needs: verify
+    # Skipped outright when the version is already published, so re-running a
+    # release for the other registry does not stop for an approval that would
+    # only skip. Any answer but a definite "yes, it is there" still runs.
+    if: needs.verify.outputs.crate_published != 'true'
     runs-on: ubuntu-latest
     # The crates-io environment holds CARGO_REGISTRY_TOKEN and a required
     # reviewer, so this waits for a human and no other job can read the token.
@@ -99,26 +124,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
-      # A version already on crates.io can never be replaced, so re-running a
-      # release must skip rather than fail: the other registry may still need
-      # publishing.
-      - id: check
-        name: Already published?
-        env:
-          VERSION: ${{ needs.verify.outputs.version }}
-        run: |
-          code="$(curl -sS -o /dev/null -w '%{http_code}' \
-            -H 'User-Agent: hypors-release' \
-            "https://crates.io/api/v1/crates/hypors/$VERSION")"
-          if [ "$code" = "200" ]; then
-            echo "crates.io already has $VERSION; skipping."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Publish
-        if: steps.check.outputs.skip == 'false'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish
@@ -186,6 +192,10 @@ jobs:
     needs: [verify, wheels, sdist]
     runs-on: ubuntu-latest
     # The pypi environment holds PYPI_API_TOKEN and a required reviewer.
+    #
+    # Deliberately not skipped the way publish-crate is: an upload is many
+    # files, so a version can exist on PyPI with wheels still missing. Running
+    # and letting skip-existing sort it out is what finishes a partial release.
     environment: pypi
     steps:
       - uses: actions/download-artifact@v8
@@ -208,6 +218,10 @@ jobs:
   github-release:
     name: GitHub Release
     needs: [verify, publish-crate, publish-pypi]
+    # publish-crate skips when the version is already on crates.io, and a
+    # skipped dependency would otherwise skip this job too. Failure anywhere
+    # upstream, including verify, still stops it.
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -19,9 +19,22 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ### Added
 
+- The Python package ships type stubs and a `py.typed` marker, so editors and
+  type checkers can see it. A compiled extension is otherwise opaque to them:
+  every call was untyped and every typo went unreported until runtime.
+- Issue forms for bug reports and feature requests. `.github/ISSUE_TEMPLATE`
+  was an empty file rather than a directory, so it did nothing at all; the bug
+  form now asks for the comparison that makes a numerical report reproducible.
 - Dependabot keeps GitHub Actions and both Cargo manifests current. Action
   deprecations otherwise surface only as a warning in a log, and the release
   workflow runs at the worst possible moment to discover a retired action.
+
+### Changed
+
+- `publish-crate` is skipped outright when the version is already on
+  crates.io, rather than starting and skipping its one real step. The job
+  sits behind a required reviewer, so the old shape asked a human to approve
+  a run that was always going to do nothing.
 
 ## [0.4.1] - 2026-09-13
 
