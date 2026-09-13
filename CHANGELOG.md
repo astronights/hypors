@@ -8,6 +8,16 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ## [Unreleased]
 
+Nothing yet. Add entries here as they land; move them under a new version
+heading when releasing, since the release workflow takes its GitHub Release
+notes from the section matching the tag.
+
+## [0.4.1] - 2026-09-13
+
+The first release of the Python package. It ships at 0.4.1 rather than 0.4.0
+because versions track the crate, and the `v0.4.0` tag predates the bindings —
+there is no Python package in that tree to publish.
+
 ### Added
 
 - **Python bindings** (`python/`), published to PyPI as `hypors` and versioned

@@ -52,7 +52,19 @@ jobs:
       - name: Versions agree with the tag
         env:
           VERSION: ${{ steps.resolve.outputs.version }}
+          TAG: ${{ steps.resolve.outputs.tag }}
         run: |
+          # A tag from before a manifest existed cannot release it, and the
+          # version comparison below would report a confusing empty mismatch.
+          missing=0
+          for file in Cargo.toml python/Cargo.toml python/pyproject.toml; do
+            if [ ! -f "$file" ]; then
+              echo "::error::$file does not exist at $TAG, so $TAG cannot release it"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+
           crate="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')"
           binding="$(cargo metadata --no-deps --format-version 1 --manifest-path python/Cargo.toml | jq -r '.packages[0].version')"
           pyproject="$(grep -m1 '^version = ' python/pyproject.toml | cut -d'"' -f2)"

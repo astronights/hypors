@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "hypors"
-version = "0.4.0"
+version = "0.4.1"
 description = "Hypothesis testing for Python, backed by the hypors Rust crate"
 readme = "README.md"
 authors = [{ name = "Shubhankar Agrawal", email = "shubhankar.a31@gmail.com" }]
