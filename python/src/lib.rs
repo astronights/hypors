@@ -22,7 +22,8 @@ fn add_submodule(
     register: fn(&Bound<'_, PyModule>) -> PyResult<()>,
 ) -> PyResult<()> {
     let py = parent.py();
-    let module = PyModule::new(py, name)?;
+    // Fully qualified, so the module reports hypors.t rather than t.
+    let module = PyModule::new(py, &format!("hypors.{name}"))?;
     register(&module)?;
     parent.add_submodule(&module)?;
     py.import("sys")?

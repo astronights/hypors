@@ -77,3 +77,49 @@ def test_test_result_inequality():
         reject_null=False,
     )
     assert make_result() != other
+
+
+def test_submodules_are_fully_qualified():
+    # A bare __name__ of "t" names a module that cannot be imported back,
+    # and shows up in every repr and traceback.
+    import hypors.anova
+    import hypors.chi_square
+    import hypors.mann_whitney
+    import hypors.proportion
+    import hypors.t
+    import hypors.z
+
+    for module, expected in [
+        (hypors.anova, "hypors.anova"),
+        (hypors.chi_square, "hypors.chi_square"),
+        (hypors.mann_whitney, "hypors.mann_whitney"),
+        (hypors.proportion, "hypors.proportion"),
+        (hypors.t, "hypors.t"),
+        (hypors.z, "hypors.z"),
+    ]:
+        assert module.__name__ == expected
+
+
+def test_test_result_survives_pickle_and_copy():
+    # Results get cached to disk and sent across process pools.
+    import copy
+    import pickle
+
+    result = make_result()
+    assert pickle.loads(pickle.dumps(result)) == result
+    assert copy.copy(result) == result
+    assert copy.deepcopy(result) == result
+
+
+def test_tail_type_survives_pickle_and_copy():
+    import copy
+    import pickle
+
+    for tail in (TailType.Left, TailType.Right, TailType.Two):
+        assert pickle.loads(pickle.dumps(tail)) == tail
+        assert copy.deepcopy(tail) == tail
+
+
+def test_tail_type_from_name_rejects_nonsense():
+    with pytest.raises(ValueError, match="unknown TailType"):
+        TailType._from_name("Sideways")

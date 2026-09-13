@@ -1,0 +1,25 @@
+# Action versions go stale silently — a deprecation warning in a log is easy
+# to miss, and the release workflow only runs at release time, which is the
+# worst moment to discover a pinned action has been retired.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: cargo
+    directory: /python
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "deps"
