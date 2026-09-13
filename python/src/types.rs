@@ -1,6 +1,7 @@
 //! The two types crossing the boundary in both directions.
 
 use hypors::common::{TailType as RsTailType, TestResult as RsTestResult};
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
@@ -29,6 +30,24 @@ impl TailType {
 
     fn __repr__(&self) -> String {
         format!("TailType.{}", self.name())
+    }
+
+    /// Rebuild a variant from its name, so the type can be pickled.
+    #[staticmethod]
+    fn _from_name(name: &str) -> PyResult<TailType> {
+        match name {
+            "Left" => Ok(TailType::Left),
+            "Right" => Ok(TailType::Right),
+            "Two" => Ok(TailType::Two),
+            other => Err(PyValueError::new_err(format!("unknown TailType: {other}"))),
+        }
+    }
+
+    // Without this the type cannot be pickled or copied, which breaks passing
+    // a tail across a multiprocessing pool.
+    fn __reduce__(slf: &Bound<'_, Self>) -> PyResult<(Py<PyAny>, (String,))> {
+        let from_name = slf.as_any().get_type().getattr("_from_name")?.unbind();
+        Ok((from_name, (slf.get().name().to_string(),)))
     }
 }
 
@@ -111,6 +130,24 @@ impl TestResult {
         dict.set_item("alt_hypothesis", &self.alt_hypothesis)?;
         dict.set_item("reject_null", self.reject_null)?;
         Ok(dict)
+    }
+
+    // A result is exactly the sort of value that gets cached to disk or sent
+    // between processes, so it has to survive pickle and copy.
+    fn __reduce__(slf: &Bound<'_, Self>) -> PyResult<(Py<PyAny>, (f64, f64, (f64, f64), String, String, bool))> {
+        let cls = slf.as_any().get_type().unbind().into_any();
+        let r = slf.get();
+        Ok((
+            cls,
+            (
+                r.test_statistic,
+                r.p_value,
+                r.confidence_interval,
+                r.null_hypothesis.clone(),
+                r.alt_hypothesis.clone(),
+                r.reject_null,
+            ),
+        ))
     }
 
     fn __repr__(&self) -> String {

@@ -8,9 +8,20 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ## [Unreleased]
 
-Nothing yet. Add entries here as they land; move them under a new version
-heading when releasing, since the release workflow takes its GitHub Release
-notes from the section matching the tag.
+### Fixed
+
+- Python submodules report a fully qualified `__name__`. `hypors.t` called
+  itself `t`, which named a module that could not be imported back and showed
+  up that way in every repr and traceback.
+- `TestResult` and `TailType` can be pickled and copied. Neither could before,
+  so a result could not be cached to disk or returned from a
+  `multiprocessing` pool, and `copy.deepcopy` failed on both.
+
+### Added
+
+- Dependabot keeps GitHub Actions and both Cargo manifests current. Action
+  deprecations otherwise surface only as a warning in a log, and the release
+  workflow runs at the worst possible moment to discover a retired action.
 
 ## [0.4.1] - 2026-09-13
 
