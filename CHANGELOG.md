@@ -22,6 +22,9 @@ a dependency on `0.3` will not resolve to `0.4`.
 - The Python package ships type stubs and a `py.typed` marker, so editors and
   type checkers can see it. A compiled extension is otherwise opaque to them:
   every call was untyped and every typo went unreported until runtime.
+- Issue forms for bug reports and feature requests. `.github/ISSUE_TEMPLATE`
+  was an empty file rather than a directory, so it did nothing at all; the bug
+  form now asks for the comparison that makes a numerical report reproducible.
 - Dependabot keeps GitHub Actions and both Cargo manifests current. Action
   deprecations otherwise surface only as a warning in a log, and the release
   workflow runs at the worst possible moment to discover a retired action.
