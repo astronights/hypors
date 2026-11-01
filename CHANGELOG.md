@@ -8,6 +8,8 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-11-01
+
 ### Fixed
 
 - Python submodules report a fully qualified `__name__`. `hypors.t` called
