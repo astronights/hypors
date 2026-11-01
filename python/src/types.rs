@@ -68,7 +68,7 @@ impl From<TailType> for RsTailType {
 ///
 /// Attributes are read-only: a result describes a computation that already
 /// happened, so mutating it would only ever misrepresent it.
-#[pyclass(eq, frozen, skip_from_py_object, module = "hypors.common")]
+#[pyclass(eq, frozen, module = "hypors.common")]
 #[derive(Debug, Clone, PartialEq)]
 pub struct TestResult {
     /// The computed test statistic.

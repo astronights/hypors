@@ -8,6 +8,8 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-11-01
+
 ### Fixed
 
 - Python submodules report a fully qualified `__name__`. `hypors.t` called
@@ -31,6 +33,9 @@ a dependency on `0.3` will not resolve to `0.4`.
 
 ### Changed
 
+- The Python package requires Python 3.9 or newer. PyO3 0.30 dropped 3.8,
+  which reached end of life in October 2024; pip on 3.8 keeps resolving to
+  the last release that supported it.
 - `publish-crate` is skipped outright when the version is already on
   crates.io, rather than starting and skipping its one real step. The job
   sits behind a required reviewer, so the old shape asked a human to approve

@@ -1,6 +1,5 @@
 use crate::common::{StatError, TailType, TestResult, calculate_chi2_ci, calculate_p};
 use statrs::distribution::ChiSquared;
-use std::f64;
 
 /// Perform a Chi-Square Test for Variance.
 ///

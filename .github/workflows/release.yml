@@ -151,7 +151,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      # abi3 means one wheel per platform covers Python 3.8+, so the matrix
+      # abi3 means one wheel per platform covers Python 3.9+, so the matrix
       # only has to cover operating systems and architectures.
       - uses: PyO3/maturin-action@v1
         with:
