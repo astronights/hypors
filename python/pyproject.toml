@@ -9,7 +9,7 @@ description = "Hypothesis testing for Python, backed by the hypors Rust crate"
 readme = "README.md"
 authors = [{ name = "Shubhankar Agrawal", email = "shubhankar.a31@gmail.com" }]
 license = "MIT"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = ["statistics", "hypothesis", "testing", "p-value"]
 classifiers = [
     "Programming Language :: Rust",
